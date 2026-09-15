@@ -4,13 +4,13 @@ export const SOLVING_STEPS: SolvingStep[] = [
   {
     id: 1,
     title: 'Make the White Cross',
-    subtitle: 'Start with Yellow Center on Top',
+    subtitle: 'Start with the yellow center on top',
     instruction: 'Start with the yellow center on top. Make a white cross around the yellow center. You should have 4 white edge pieces around the yellow center.',
     subInstructions: [
-      'Start with the yellow center facing directly UP on the top face.',
-      'Find the 4 edge pieces that have a white sticker.',
-      'Place all 4 white edge pieces around the yellow center to form the white cross (the Daisy).',
-      'Side colors do not need to match their centers yet—just get the 4 white edges on top!'
+      'Start with the yellow center on top.',
+      'Make a white cross around the yellow center.',
+      'You should have 4 white edge pieces around the yellow center.',
+      'Side colors do not need to match their centers yet—just get all 4 white edges on top!'
     ],
     algorithm: "F R U R' U' F'",
     moves: ['F', 'R', 'U', "R'", "U'", "F'"],
@@ -21,40 +21,46 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Yellow Center on Top',
       'Find White Edges',
       'Place Around Yellow Center',
-      'Daisy Complete'
+      'White Cross Complete'
     ]
   },
   {
     id: 2,
-    title: 'Move Cross to Bottom',
-    subtitle: 'Align Centers & Transfer White Cross',
-    instruction: 'Match the side color of each white edge with its matching center color. Once matched, rotate that side 180° to move the white piece to the bottom. Do this for all four white edges.',
+    title: 'Move the White Cross to the Bottom',
+    subtitle: 'Match Side Colors & Rotate 180°',
+    instruction: 'Match the side color of each white edge with its matching center color. Example: white + red edge → match it with the red center. Once matched, rotate that side 180° to move the white piece to the bottom. Do this for all 4 white edges. Now you have a white cross on the bottom, with all side colors matching their centers.',
     subInstructions: [
-      'Look at the side color of a white edge on top (e.g. White + Red).',
-      'Turn that face 180° (F2, R2, B2, L2) to move the white edge piece to the bottom.',
-      'Repeat for all four white edges until the white cross is on the bottom face.'
+      'Match the side color of each white edge with its matching center color.',
+      'Example: white + red edge → match it with the red center.',
+      'Once matched, rotate that side 180° to move the white piece to the bottom.',
+      'Do this for all 4 white edges.',
+      'Now you have a white cross on the bottom, with all side colors matching their centers.'
     ],
     algorithm: 'F2 R2 B2 L2',
     moves: ['F2', 'R2', 'B2', 'L2'],
-    tip: 'After rotating all 4 faces 180°, the White cross is permanently on the bottom (-Y) and Yellow remains on top (+Y).',
+    tip: 'After rotating all 4 faces 180°, the White cross is permanently on the bottom and Yellow remains on top.',
     warning: 'Always rotate the face a full 180° to ensure the white sticker reaches the bottom.',
     highlightFaces: ['D', 'F', 'R'],
     stageDiagram: [
-      'Daisy on Top',
-      'Match Side Colors',
-      'Rotate Face 180°',
+      'White Cross on Top',
+      'Match Side Color',
+      'Rotate Side 180°',
       'White Cross on Bottom'
     ]
   },
   {
     id: 3,
     title: 'Solve the White Corners',
-    subtitle: 'Complete the First Layer',
-    instruction: 'Find a white corner piece. Check its other two colors and position it above where it belongs (between those matching centers). Use the 4-move algorithm until the corner drops into place facing down.',
+    subtitle: "Insert Using R U R' U'",
+    instruction: "Find a white corner. Check its other two colors and find the matching center colors. Example: a white + red + blue corner belongs between the white, red, and blue centers. Put the corner in the correct position. Insert it using: R U R' U'. Repeat until all 4 white corners are solved. Now the complete white layer should be solved.",
     subInstructions: [
-      'Find a corner with White in the top layer (e.g., White + Red + Green).',
-      'Position it directly above the slot between the Red and Green centers.',
-      'Perform the algorithm R U R\' U\' (1 to 5 times) until the white sticker faces down and side colors match.'
+      'Find a white corner.',
+      'Check its other two colors and find the matching center colors.',
+      'Example: a white + red + blue corner belongs between the white, red, and blue centers.',
+      'Put the corner in the correct position.',
+      "Insert it using: R U R' U'",
+      'Repeat until all 4 white corners are solved.',
+      'Now the complete white layer should be solved.'
     ],
     algorithm: "R U R' U'",
     moves: ['R', 'U', "R'", "U'"],
@@ -62,33 +68,33 @@ export const SOLVING_STEPS: SolvingStep[] = [
     warning: 'Keep the corner piece directly in the front-right slot before executing the algorithm.',
     highlightFaces: ['D', 'R', 'F'],
     stageDiagram: [
-      'Corner in Top-Right',
-      'Apply R U R\' U\'',
-      'Corner Inserted',
-      'First Layer Solved'
+      'Corner in Position',
+      "Apply R U R' U'",
+      'Repeat as Needed',
+      'Complete White Layer'
     ],
     setupScramble: ['U', 'R', 'U', "R'", "U'"]
   },
   {
     id: 4,
     title: 'Middle Layer — Left',
-    subtitle: 'Insert Edge Piece to the Left',
-    instruction: 'Use this algorithm when an edge piece in the top layer needs to be moved into the middle layer on the left side.',
+    subtitle: "U' L' U L U F U' F'",
+    instruction: "Use this algorithm when an edge piece in the top layer needs to move into the middle layer on the left side: U' L' U L U F U' F'",
     subInstructions: [
       'Find an edge on the top face that does NOT contain yellow.',
-      'Match the front sticker of this edge with the front center color.',
-      'If the top sticker matches the left center, the piece needs to go to the LEFT.',
-      'Execute the 8-move sequence below.'
+      'Match its front sticker with the front center color.',
+      'If the top sticker matches the left center, the piece belongs on the LEFT.',
+      "Execute: U' L' U L U F U' F'"
     ],
     algorithm: "U' L' U L U F U' F'",
     moves: ["U'", "L'", 'U', 'L', 'U', 'F', "U'", "F'"],
-    tip: 'Think of it as two 4-move halves: first pair the corner with the edge, then insert them together into the slot.',
+    tip: 'First pair the corner with the edge, then insert them together into the left slot.',
     warning: 'Do not rotate the entire cube while performing the algorithm.',
     highlightFaces: ['F', 'L'],
     stageDiagram: [
       'Target Edge Aligned',
       'Pair Edge & Corner',
-      'Rotate Front Face',
+      'Insert into Slot',
       'Left Middle Edge Solved'
     ],
     setupScramble: ['F', 'U', "F'", "U'", "L'", "U'", 'L', 'U']
@@ -96,13 +102,13 @@ export const SOLVING_STEPS: SolvingStep[] = [
   {
     id: 5,
     title: 'Middle Layer — Right',
-    subtitle: 'Insert Edge Piece to the Right',
-    instruction: 'Use this algorithm when an edge piece in the top layer needs to be moved into the middle layer on the right side.',
+    subtitle: "U R U' R' U' F' U F",
+    instruction: "Use this algorithm when an edge piece in the top layer needs to move into the middle layer on the right side: U R U' R' U' F' U F",
     subInstructions: [
       'Find an edge on the top face that does NOT contain yellow.',
-      'Match its front sticker with the front center.',
+      'Match its front sticker with the front center color.',
       'If the top sticker matches the right center, the piece belongs on the RIGHT.',
-      'Execute the 8-move sequence below.'
+      "Execute: U R U' R' U' F' U F"
     ],
     algorithm: "U R U' R' U' F' U F",
     moves: ['U', 'R', "U'", "R'", "U'", "F'", 'U', 'F'],
@@ -112,20 +118,21 @@ export const SOLVING_STEPS: SolvingStep[] = [
     stageDiagram: [
       'Target Edge Aligned',
       'Pair Edge & Corner',
-      'Insert into Right Slot',
+      'Insert into Slot',
       'Both Layers Complete'
     ],
     setupScramble: ["F'", "U'", 'F', 'U', 'R', 'U', "R'", "U'"]
   },
   {
     id: 6,
-    title: 'Make the Yellow Cross',
-    subtitle: 'Orient Last Layer Edges',
-    instruction: 'Make a yellow cross on the top face. Keep yellow on top and use the algorithm until you get a full yellow cross.',
+    title: 'Yellow Cross',
+    subtitle: "F U R U' R' F'",
+    instruction: "Use this algorithm: F U R U' R' F'. Repeat until you get a yellow cross on top.",
     subInstructions: [
-      'You will see one of 3 patterns: a Dot, an "L" shape (put it in the top-left), or a horizontal Line.',
-      'Execute F U R U\' R\' F\'.',
-      'If you started with an "L", one execution gives a line. If you have a horizontal line, one execution creates the cross!'
+      'Keep the yellow center on top.',
+      'You will see a Dot, an "L" shape (put in top-left), or a horizontal Line.',
+      "Execute: F U R U' R' F'",
+      'Repeat until you get a yellow cross on top.'
     ],
     algorithm: "F U R U' R' F'",
     moves: ['F', 'U', 'R', "U'", "R'", "F'"],
@@ -134,89 +141,92 @@ export const SOLVING_STEPS: SolvingStep[] = [
     highlightFaces: ['U'],
     stageDiagram: [
       'Dot Pattern',
-      'L-Shape in Back-Left',
+      'L-Shape in Top-Left',
       'Horizontal Line',
-      'Yellow Cross Formed'
+      'Yellow Cross on Top'
     ],
     setupScramble: ['F', 'R', 'U', "R'", "U'", "F'"]
   },
   {
     id: 7,
     title: 'Full Yellow Face — Fish Shape',
-    subtitle: 'Orient All Yellow Corners (Sune)',
-    instruction: 'When you have the fish shape, use this algorithm. Repeat or reposition as needed until the entire top face becomes yellow.',
+    subtitle: "R U R' U R U2 R'",
+    instruction: "Use this when you have the fish shape: R U R' U R U2 R'. Repeat/reposition as needed until the entire top is yellow.",
     subInstructions: [
-      'Hold the cube so the "fish mouth" (the single solved yellow corner) points to the bottom-left.',
-      'Check if the front-right corner has yellow facing you.',
-      'Apply the algorithm R U R\' U R U2 R\'.'
+      'Use this when you have the fish shape (cross + 1 yellow corner).',
+      'Hold the cube so the fish head points to the bottom-left.',
+      "Execute: R U R' U R U2 R'",
+      'Repeat/reposition as needed until the entire top is yellow.'
     ],
     algorithm: "R U R' U R U2 R'",
     moves: ['R', 'U', "R'", 'U', 'R', 'U2', "R'"],
-    tip: 'This classic algorithm is named "Sune" (pronounced soo-nay). It rotates three corners while keeping the cross intact.',
-    warning: 'Ensure the fish nose is pointing towards the bottom-left (front-left) before executing.',
+    tip: 'This classic algorithm is named "Sune". It preserves the yellow cross while cycling three yellow corners.',
+    warning: 'Ensure the fish nose is pointing towards the bottom-left before executing.',
     highlightFaces: ['U'],
     stageDiagram: [
-      'Fish Shape',
+      'Fish Shape on Top',
+      'Fish Mouth Bottom-Left',
       'Apply Algorithm',
-      'More Yellow',
-      'Full Yellow Face'
+      'Entire Top is Yellow'
     ],
     setupScramble: ['R', 'U2', "R'", "U'", 'R', "U'", "R'"]
   },
   {
     id: 8,
     title: 'Position Yellow Corners',
-    subtitle: 'Permute Last Layer Corners',
-    instruction: 'Move the yellow corners into their correct positions. The yellow stickers may already be facing upward, but the corners may still be in the wrong locations. Match the side colors with the center colors.',
+    subtitle: "R' F R' B2 R F' R' B2 R2",
+    instruction: "Move the yellow corners into their correct positions using: R' F R' B2 R F' R' B2 R2.",
     subInstructions: [
-      'Look for two corners with matching side colors ("headlights"). Put them in the back (B face).',
-      'If no headlights exist, do the algorithm once from any angle to create headlights.',
-      'Execute the algorithm below to solve all four corners.'
+      'Look for two corners with matching side colors ("headlights"). Put them in the back.',
+      'If no headlights exist, do the algorithm once from any angle to create them.',
+      "Execute: R' F R' B2 R F' R' B2 R2",
+      'Move the yellow corners into their correct positions.'
     ],
     algorithm: "R' F R' B2 R F' R' B2 R2",
     moves: ["R'", 'F', "R'", 'B2', 'R', "F'", "R'", 'B2', 'R2'],
-    tip: 'Hold the matching pair in the back. If you have no matching headlights, run the algorithm once and a pair will appear.',
+    tip: 'Hold the matching pair in the back (B face). If you have no matching headlights, run the algorithm once to create them.',
     warning: 'B2 means rotating the Back face 180°. Do not confuse Back with Bottom.',
     highlightFaces: ['U', 'B'],
     stageDiagram: [
       'Find Headlights',
-      'Place in Back',
+      'Headlights in Back',
       'Execute Sequence',
-      'All 4 Corners Positioned'
+      'All Corners Positioned'
     ],
     setupScramble: ['R2', 'B2', 'R', 'F', "R'", 'B2', 'R', "F'", 'R']
   },
   {
     id: 9,
-    title: 'Position Yellow Edges',
-    subtitle: 'Permute Last Layer Edges to Finish',
-    instruction: 'Move the remaining yellow edges into their correct positions so that all side colors match their centers.',
+    title: 'Position Yellow Edges / Finish',
+    subtitle: "R2 U R U R' U' R' U' R' U R'",
+    instruction: "Move the remaining yellow edges into their correct positions using: R2 U R U R' U' R' U' R' U R'.",
     subInstructions: [
       'If one side is completely solved, put that completed face in the back (B face).',
       'If no sides are fully solved, apply this algorithm once from any angle to solve one side, then place it in the back.',
-      'Execute the algorithm below 1 or 2 times to solve the final edges!'
+      "Execute: R2 U R U R' U' R' U' R' U R'",
+      'Move the remaining yellow edges into their correct positions.'
     ],
     algorithm: "R2 U R U R' U' R' U' R' U R'",
     moves: ['R2', 'U', 'R', 'U', "R'", "U'", "R'", "U'", "R'", 'U', "R'"],
-    tip: 'Watch the edges cycle clockwise. You are just a few turns away from a completely solved Rubik\'s Cube!',
+    tip: 'Watch the edges cycle clockwise. You are just a single execution away from a completely solved cube!',
     warning: 'Keep the fully solved side face firmly in the back while executing.',
     highlightFaces: ['U', 'F', 'R', 'L'],
     stageDiagram: [
-      'One Solved Face in Back',
-      '3 Unsolved Edges',
+      'Solved Face in Back',
       'Cycle Remaining Edges',
-      '100% Solved Cube'
+      'Final Alignment',
+      'Cube Solved'
     ],
     setupScramble: ['R', "U'", 'R', 'U', 'R', 'U', 'R', "U'", "R'", "U'", 'R2']
   },
   {
     id: 10,
-    title: 'Cube Solved!',
-    subtitle: 'Congratulations, You Solved the 3×3 Rubik\'s Cube',
-    instruction: 'Congratulations! You have successfully solved the Rubik\'s Cube step-by-step from the Daisy to the complete solved state. You have mastered the beginner Layer-by-Layer method.',
+    title: 'Cube Solved',
+    subtitle: 'All 6 Faces Solved',
+    instruction: 'Congratulations! All 6 faces of the 3×3 Rubik\'s Cube are fully solved. You have mastered the beginner Layer-by-Layer solving method.',
     subInstructions: [
       'Inspect your solved cube in 3D by dragging with your mouse or finger.',
-      'Try scrambling the cube and following the steps from memory.',
+      'Try scrambling the cube and following the 10 steps from memory.',
       'Practice individual algorithms to build muscle memory!'
     ],
     algorithm: 'Solved',
@@ -228,7 +238,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'First Layer Complete',
       'Second Layer Complete',
       'Yellow Face Complete',
-      'Fully Solved'
+      'Cube Solved'
     ]
   }
 ];
