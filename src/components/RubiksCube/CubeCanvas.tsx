@@ -40,7 +40,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
     const controlsRef = useRef<OrbitControlsImpl>(null);
 
     const presetPositions: Record<CameraPreset, [number, number, number]> = {
-      isometric: [4.8, 4.2, 5.8],
+      isometric: [4.2, 5.0, 5.2],
       front: [0, 0, 7.5],
       top: [0, 7.5, 0.001],
       right: [7.5, 0, 0],
@@ -68,6 +68,9 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       },
       resetToSolved: () => {
         cubeRef.current?.resetToSolved();
+      },
+      resetToDaisy: () => {
+        return cubeRef.current?.resetToDaisy() ?? Promise.resolve();
       },
       applyScramble: (moves: MoveNotation[]) => {
         return cubeRef.current?.applyScramble(moves) ?? Promise.resolve();
@@ -97,7 +100,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
         {/* 3D WebGL Canvas */}
         <Canvas
           shadows
-          camera={{ position: [4.8, 4.2, 5.8], fov: 42 }}
+          camera={{ position: [4.2, 5.0, 5.2], fov: 42 }}
           gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >

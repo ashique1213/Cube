@@ -4,12 +4,13 @@ export const SOLVING_STEPS: SolvingStep[] = [
   {
     id: 1,
     title: 'Make the White Cross',
-    subtitle: 'The Daisy around Yellow Center',
-    instruction: 'Start with the yellow center on top. Make a white cross around the yellow center. You should have four white edge pieces around the yellow center.',
+    subtitle: 'Start with Yellow Center on Top',
+    instruction: 'Start with the yellow center on top. Make a white cross around the yellow center. You should have 4 white edge pieces around the yellow center.',
     subInstructions: [
-      'Look for the 4 edge pieces with a white sticker.',
-      'Bring each white edge up to the top layer around the yellow center.',
-      'Do not worry about the side colors yet—just get the white stickers on top!'
+      'Start with the yellow center facing directly UP on the top face.',
+      'Find the 4 edge pieces that have a white sticker.',
+      'Place all 4 white edge pieces around the yellow center to form the white cross (the Daisy).',
+      'Side colors do not need to match their centers yet—just get the 4 white edges on top!'
     ],
     algorithm: "F R U R' U' F'",
     moves: ['F', 'R', 'U', "R'", "U'", "F'"],
@@ -17,12 +18,11 @@ export const SOLVING_STEPS: SolvingStep[] = [
     warning: 'Be careful not to knock out previously placed white edges while bringing new ones up.',
     highlightFaces: ['U'],
     stageDiagram: [
-      'Scrambled Cube',
+      'Yellow Center on Top',
       'Find White Edges',
       'Place Around Yellow Center',
       'Daisy Complete'
-    ],
-    setupScramble: ['R', 'U', "R'", 'F', 'D', 'L', 'B2', 'U2']
+    ]
   },
   {
     id: 2,
@@ -31,22 +31,20 @@ export const SOLVING_STEPS: SolvingStep[] = [
     instruction: 'Match the side color of each white edge with its matching center color. Once matched, rotate that side 180° to move the white piece to the bottom. Do this for all four white edges.',
     subInstructions: [
       'Look at the side color of a white edge on top (e.g. White + Red).',
-      'Turn the top (U) face until the Red sticker aligns with the Red center.',
-      'Rotate that face 180° (e.g. R2 or F2) to lock the white piece into the bottom face.',
-      'Repeat for Green, Orange, and Blue edges.'
+      'Turn that face 180° (F2, R2, B2, L2) to move the white edge piece to the bottom.',
+      'Repeat for all four white edges until the white cross is on the bottom face.'
     ],
-    algorithm: 'F2 U R2 U L2 U B2',
-    moves: ['F2', 'U', 'R2', 'U', 'L2', 'U', 'B2'],
-    tip: 'After this step, turn the cube so the White cross is permanently on the bottom (-Y) and Yellow remains on top (+Y).',
-    warning: 'Always match the side color before doing the 180° turn, otherwise the cross will be misaligned.',
+    algorithm: 'F2 R2 B2 L2',
+    moves: ['F2', 'R2', 'B2', 'L2'],
+    tip: 'After rotating all 4 faces 180°, the White cross is permanently on the bottom (-Y) and Yellow remains on top (+Y).',
+    warning: 'Always rotate the face a full 180° to ensure the white sticker reaches the bottom.',
     highlightFaces: ['D', 'F', 'R'],
     stageDiagram: [
       'Daisy on Top',
       'Match Side Colors',
       'Rotate Face 180°',
       'White Cross on Bottom'
-    ],
-    setupScramble: ["F'", 'U', 'R', 'U2', "R'", 'F', 'U']
+    ]
   },
   {
     id: 3,

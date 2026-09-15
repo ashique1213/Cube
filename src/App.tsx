@@ -119,7 +119,9 @@ export const App: React.FC = () => {
     if (isAnimating) return;
     setIsPlayingAlgorithm(false);
 
-    if (currentMoveIndex >= 0) {
+    if (currentStepIndex === 0) {
+      await cubeCanvasRef.current?.resetToDaisy();
+    } else if (currentMoveIndex >= 0) {
       const executed = currentStep.moves.slice(0, currentMoveIndex + 1).reverse();
       for (const move of executed) {
         const inv = getInverseMove(move);
@@ -127,7 +129,7 @@ export const App: React.FC = () => {
       }
     }
     setCurrentMoveIndex(-1);
-  }, [isAnimating, currentMoveIndex, currentStep]);
+  }, [isAnimating, currentMoveIndex, currentStep, currentStepIndex]);
 
   // Step change navigation
   const handleStepChange = useCallback((newIndex: number) => {
@@ -136,7 +138,9 @@ export const App: React.FC = () => {
     setCurrentMoveIndex(-1);
     setCurrentStepIndex(newIndex);
 
-    if (newIndex === 9) {
+    if (newIndex === 0) {
+      cubeCanvasRef.current?.resetToDaisy();
+    } else if (newIndex === 9) {
       setIsSolvedModalOpen(true);
     }
   }, []);
@@ -155,12 +159,24 @@ export const App: React.FC = () => {
     setMoveHistory([]);
   }, [isAnimating, isPlayingAlgorithm]);
 
-  // Reset to solved state
+  // Reset cube (Daisy for Step 1, Solved for others)
   const handleResetCube = useCallback(() => {
     setIsPlayingAlgorithm(false);
     setCurrentMoveIndex(-1);
-    cubeCanvasRef.current?.resetToSolved();
+    if (currentStepIndex === 0) {
+      cubeCanvasRef.current?.resetToDaisy();
+    } else {
+      cubeCanvasRef.current?.resetToSolved();
+    }
     setMoveHistory([]);
+  }, [currentStepIndex]);
+
+  // Start with White Cross around Yellow Center by default
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      cubeCanvasRef.current?.resetToDaisy();
+    }, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   // Undo last move
