@@ -39,7 +39,7 @@ export const StepPanel: React.FC<StepPanelProps> = ({
   const canStepForward = currentMoveIndex < step.moves.length;
 
   return (
-    <div className="w-full flex flex-col h-full bg-white rounded-xl border border-slate-200 p-3.5 sm:p-4 shadow-sm space-y-3 overflow-y-auto">
+    <div className="w-full flex flex-col h-full bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 p-3.5 sm:p-4 shadow-sm space-y-3 overflow-y-auto">
       {/* 1. Step Navigation Header */}
       <StepNavigation
         currentStepIndex={currentStepIndex}
@@ -47,21 +47,21 @@ export const StepPanel: React.FC<StepPanelProps> = ({
         isAnimating={isAnimating || isPlayingAlgorithm}
       />
 
-      <div className="h-px w-full bg-slate-200" />
+      <div className="h-px w-full bg-slate-200/80" />
 
       {/* 2. Step Title & Subtitle */}
       <div>
-        <div className="flex items-center gap-1.5 mb-0.5">
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 uppercase">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xs uppercase tracking-wide">
             Step {step.id}
           </span>
           {isStep10 && (
-            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs flex items-center gap-1">
               <Trophy className="w-3 h-3" /> Solved
             </span>
           )}
         </div>
-        <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+        <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent tracking-tight">
           {step.title}
         </h2>
         {step.subtitle && (
@@ -95,11 +95,11 @@ export const StepPanel: React.FC<StepPanelProps> = ({
         />
       )}
 
-      {/* Step 10 Celebration Action (clean, no emojis) */}
+      {/* Step 10 Celebration Action (clean, gradient styling, no emojis) */}
       {isStep10 && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-2.5">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-            <Trophy className="w-4 h-4" />
+        <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border border-emerald-300 text-center space-y-2.5 shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center mx-auto shadow-md shadow-emerald-500/20">
+            <Trophy className="w-5 h-5" />
           </div>
           <div>
             <div className="text-sm font-bold text-emerald-950">Mastered the 3×3 Cube</div>
@@ -110,7 +110,7 @@ export const StepPanel: React.FC<StepPanelProps> = ({
           {onSolveAgain && (
             <button
               onClick={onSolveAgain}
-              className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 active:scale-[0.99]"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Solve Again from Step 1</span>

@@ -83,17 +83,17 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
     }));
 
     return (
-      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-2xl overflow-hidden border border-indigo-100/90 shadow-[0_10px_35px_-5px_rgba(99,102,241,0.08)]">
         {/* Quick View Controls */}
         <ViewControls
           onPresetSelect={handleCameraPreset}
           onResetView={handleResetCamera}
         />
 
-        {/* Orbit Helper Tip (clean, no emojis) */}
-        <div className="absolute bottom-2.5 left-3 z-10 pointer-events-none text-[11px] text-slate-500 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md border border-slate-200 shadow-sm flex items-center gap-1.5 font-medium">
+        {/* Orbit Helper Tip */}
+        <div className="absolute bottom-2.5 left-3 z-10 pointer-events-none text-[10px] sm:text-[11px] text-slate-500 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-indigo-100/80 shadow-xs flex items-center gap-1.5 font-medium">
           <span>Rotate: Click & Drag</span>
-          <span>•</span>
+          <span className="text-indigo-300">•</span>
           <span>Zoom: Scroll</span>
         </div>
 

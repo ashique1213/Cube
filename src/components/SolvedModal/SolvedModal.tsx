@@ -65,17 +65,17 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
         </button>
 
         {/* Trophy Icon */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shadow-sm">
+        <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30">
           <Trophy className="w-8 h-8" />
         </div>
 
         {/* Congratulatory Text (clean, no emojis) */}
-        <div className="space-y-1">
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <div className="space-y-1.5">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Mission Accomplished</span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent tracking-tight">
             Cube Solved
           </h2>
           <p className="text-xs text-slate-600">
@@ -84,17 +84,17 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
         </div>
 
         {/* Stats summary */}
-        <div className="grid grid-cols-3 gap-2 py-2.5 px-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+        <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-xl border border-slate-200/90 text-xs shadow-2xs">
           <div>
-            <div className="text-slate-500 text-[10px] uppercase font-semibold">Stages</div>
+            <div className="text-slate-500 text-[10px] uppercase font-bold">Stages</div>
             <div className="font-bold text-slate-900 text-sm">10 / 10</div>
           </div>
           <div>
-            <div className="text-slate-500 text-[10px] uppercase font-semibold">Method</div>
+            <div className="text-slate-500 text-[10px] uppercase font-bold">Method</div>
             <div className="font-bold text-blue-700 text-sm">LBL</div>
           </div>
           <div>
-            <div className="text-slate-500 text-[10px] uppercase font-semibold">Physics</div>
+            <div className="text-slate-500 text-[10px] uppercase font-bold">Physics</div>
             <div className="font-bold text-emerald-700 text-sm">Real 3D</div>
           </div>
         </div>
@@ -103,7 +103,7 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
         <div className="space-y-2 pt-1">
           <button
             onClick={onSolveAgain}
-            className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5"
+            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-1.5 active:scale-[0.99]"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Solve Again from Step 1</span>
@@ -111,7 +111,7 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors border border-slate-200"
+            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-b from-white to-slate-100 hover:from-slate-50 hover:to-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all border border-slate-300 shadow-2xs"
           >
             Inspect 3D Cube
           </button>

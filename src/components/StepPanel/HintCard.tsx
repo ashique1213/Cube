@@ -19,17 +19,17 @@ export const HintCard: React.FC<HintCardProps> = ({
   return (
     <div className="space-y-2.5 text-xs">
       {/* Primary Instruction */}
-      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed font-normal">
-        <p className="font-medium text-slate-900 mb-1.5 text-xs sm:text-sm">{instruction}</p>
+      <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 via-white to-blue-50/30 border border-slate-200/90 text-slate-700 leading-relaxed font-normal shadow-2xs">
+        <p className="font-semibold text-slate-900 mb-1.5 text-xs sm:text-sm">{instruction}</p>
 
         {subInstructions.length > 0 && (
-          <ul className="space-y-1 mt-2 text-slate-600">
+          <ul className="space-y-1.5 mt-2.5 text-slate-600">
             {subInstructions.map((item, idx) => (
-              <li key={idx} className="flex items-start gap-1.5">
-                <span className="w-3.5 h-3.5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0 text-[9px] font-bold mt-0.5">
+              <li key={idx} className="flex items-start gap-2">
+                <span className="w-4 h-4 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5 shadow-xs">
                   {idx + 1}
                 </span>
-                <span>{item}</span>
+                <span className="leading-snug">{item}</span>
               </li>
             ))}
           </ul>
@@ -38,14 +38,14 @@ export const HintCard: React.FC<HintCardProps> = ({
 
       {/* Stage Progression Flow Diagram */}
       {stageDiagram.length > 0 && (
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
-          <div className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+        <div className="p-2.5 rounded-xl bg-gradient-to-b from-slate-50 to-slate-100/50 border border-slate-200/90 shadow-2xs">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
             Stage Roadmap
           </div>
-          <div className="flex flex-wrap items-center gap-1 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
             {stageDiagram.map((stage, idx) => (
               <React.Fragment key={idx}>
-                <span className="px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200 font-medium shadow-sm">
+                <span className="px-2.5 py-0.5 rounded-lg bg-white text-slate-800 border border-slate-200 font-semibold shadow-2xs">
                   {stage}
                 </span>
                 {idx < stageDiagram.length - 1 && (
@@ -57,24 +57,28 @@ export const HintCard: React.FC<HintCardProps> = ({
         </div>
       )}
 
-      {/* Tip Box (clean, no emojis) */}
+      {/* Tip Box (clean, gradient styling, no emojis) */}
       {tip && (
-        <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 flex items-start gap-2">
-          <Lightbulb className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-amber-950">Tip: </span>
-            <span>{tip}</span>
+        <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/10 via-yellow-500/5 to-amber-500/15 border border-amber-300/80 text-amber-950 flex items-start gap-2.5 shadow-2xs">
+          <div className="p-1 rounded-md bg-amber-500/15 text-amber-700 flex-shrink-0 mt-0.5">
+            <Lightbulb className="w-3.5 h-3.5" />
+          </div>
+          <div className="leading-snug">
+            <span className="font-bold text-amber-950">Tip: </span>
+            <span className="text-amber-900">{tip}</span>
           </div>
         </div>
       )}
 
-      {/* Warning Box (clean, no emojis) */}
+      {/* Warning Box (clean, gradient styling, no emojis) */}
       {warning && (
-        <div className="p-2.5 rounded-xl bg-rose-50/80 border border-rose-200 text-rose-900 flex items-start gap-2">
-          <AlertTriangle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-rose-950">Important: </span>
-            <span>{warning}</span>
+        <div className="p-3 rounded-xl bg-gradient-to-br from-rose-500/10 via-red-500/5 to-rose-500/15 border border-rose-300/80 text-rose-950 flex items-start gap-2.5 shadow-2xs">
+          <div className="p-1 rounded-md bg-rose-500/15 text-rose-700 flex-shrink-0 mt-0.5">
+            <AlertTriangle className="w-3.5 h-3.5" />
+          </div>
+          <div className="leading-snug">
+            <span className="font-bold text-rose-950">Important: </span>
+            <span className="text-rose-900">{warning}</span>
           </div>
         </div>
       )}

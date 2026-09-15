@@ -221,7 +221,11 @@ export const App: React.FC = () => {
   }, [handlePlayFullAlgorithm, handleNextMove]);
 
   return (
-    <div className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-slate-50 text-slate-900 flex flex-col lg:overflow-hidden font-sans select-none">
+    <div className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-gradient-to-br from-slate-50 via-sky-50/15 to-indigo-50/25 text-slate-900 flex flex-col lg:overflow-hidden font-sans select-none relative">
+      {/* Subtle ambient lighting orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
+
       {/* 1. Responsive Header (Fixed Height, flex-shrink-0) */}
       <Header
         onOpenNotation={() => setIsNotationOpen(true)}
@@ -280,8 +284,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* 3. Footer (Fixed Height, flex-shrink-0) */}
-      <footer className="flex-shrink-0 w-full border-t border-slate-200 py-1.5 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] text-slate-500 bg-white">
-        <span>Interactive 3D Rubik's Cube Solver • Beginner Layer-by-Layer Method • Three.js & React Three Fiber</span>
+      <footer className="flex-shrink-0 w-full border-t border-slate-200/80 py-1.5 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] text-slate-500 bg-white/80 backdrop-blur-sm">
+        <span className="bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 bg-clip-text text-transparent font-medium">
+          Interactive 3D Rubik's Cube Solver • Beginner Layer-by-Layer Method • Three.js & React Three Fiber
+        </span>
       </footer>
 
       {/* Modals */}
