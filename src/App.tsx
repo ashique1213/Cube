@@ -77,12 +77,14 @@ export const App: React.FC = () => {
   // "Play Full Algorithm" playback runner
   const handlePlayFullAlgorithm = useCallback(async () => {
     if (isPlayingAlgorithm) {
+      isPlayingRef.current = false;
       setIsPlayingAlgorithm(false);
       return;
     }
 
     if (currentStep.moves.length === 0) return;
 
+    isPlayingRef.current = true;
     setIsPlayingAlgorithm(true);
 
     let startIdx = currentMoveIndex + 1;
@@ -104,6 +106,7 @@ export const App: React.FC = () => {
       }
     }
 
+    isPlayingRef.current = false;
     setIsPlayingAlgorithm(false);
 
     if (currentStep.id === 9 && isPlayingRef.current) {
@@ -117,10 +120,11 @@ export const App: React.FC = () => {
   // Reset current step moves (undo what was played in this step)
   const handleResetStep = useCallback(async () => {
     if (isAnimating) return;
+    isPlayingRef.current = false;
     setIsPlayingAlgorithm(false);
 
     if (currentStepIndex === 0) {
-      await cubeCanvasRef.current?.resetToDaisy();
+      cubeCanvasRef.current?.resetToDaisy(false);
     } else if (currentMoveIndex >= 0) {
       const executed = currentStep.moves.slice(0, currentMoveIndex + 1).reverse();
       for (const move of executed) {
@@ -134,37 +138,45 @@ export const App: React.FC = () => {
   // Step change navigation
   const handleStepChange = useCallback((newIndex: number) => {
     if (newIndex < 0 || newIndex >= SOLVING_STEPS.length) return;
+    isPlayingRef.current = false;
     setIsPlayingAlgorithm(false);
     setCurrentMoveIndex(-1);
     setCurrentStepIndex(newIndex);
 
     if (newIndex === 0) {
-      cubeCanvasRef.current?.resetToDaisy();
+      cubeCanvasRef.current?.resetToDaisy(false);
     } else if (newIndex === 9) {
       setIsSolvedModalOpen(true);
     }
   }, []);
 
-  // Global Scramble
+  // Global Scramble (On Step 1, keeps top Daisy and shuffles all other sides)
   const handleScrambleCube = useCallback(async () => {
     if (isAnimating || isPlayingAlgorithm) return;
+    isPlayingRef.current = false;
     setIsPlayingAlgorithm(false);
     setCurrentMoveIndex(-1);
 
-    const moves: MoveNotation[] = [
-      'R', 'U', "R'", "U'", 'L', 'F', "L'", "F'",
-      'D2', 'R2', 'B', "U'", 'B2', 'L2', 'D', "R'"
-    ];
-    await cubeCanvasRef.current?.applyScramble(moves);
+    if (currentStepIndex === 0) {
+      // Re-scramble other sides while preserving the top White Cross around Yellow Center
+      cubeCanvasRef.current?.resetToDaisy(true);
+    } else {
+      const moves: MoveNotation[] = [
+        'R', 'U', "R'", "U'", 'L', 'F', "L'", "F'",
+        'D2', 'R2', 'B', "U'", 'B2', 'L2', 'D', "R'"
+      ];
+      await cubeCanvasRef.current?.applyScramble(moves);
+    }
     setMoveHistory([]);
-  }, [isAnimating, isPlayingAlgorithm]);
+  }, [isAnimating, isPlayingAlgorithm, currentStepIndex]);
 
-  // Reset cube (Daisy for Step 1, Solved for others)
+  // Reset cube (Daisy on top + shuffled other sides for Step 1, Solved for others)
   const handleResetCube = useCallback(() => {
+    isPlayingRef.current = false;
     setIsPlayingAlgorithm(false);
     setCurrentMoveIndex(-1);
     if (currentStepIndex === 0) {
-      cubeCanvasRef.current?.resetToDaisy();
+      cubeCanvasRef.current?.resetToDaisy(false);
     } else {
       cubeCanvasRef.current?.resetToSolved();
     }

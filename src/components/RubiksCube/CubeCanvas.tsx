@@ -69,8 +69,8 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       resetToSolved: () => {
         cubeRef.current?.resetToSolved();
       },
-      resetToDaisy: () => {
-        return cubeRef.current?.resetToDaisy() ?? Promise.resolve();
+      resetToDaisy: (randomize = false) => {
+        cubeRef.current?.resetToDaisy(randomize);
       },
       applyScramble: (moves: MoveNotation[]) => {
         return cubeRef.current?.applyScramble(moves) ?? Promise.resolve();

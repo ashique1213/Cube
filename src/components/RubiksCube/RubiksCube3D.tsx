@@ -2,14 +2,14 @@ import React, { useRef, useImperativeHandle, forwardRef, useEffect, useMemo } fr
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { CubiePiece } from './CubiePiece';
-import { getCubieCoordinates, parseMove, snapVector, snapQuaternion, isCubieInLayer } from '../../engine/rotationPhysics';
+import { getCubieCoordinates, parseMove, snapVector, snapQuaternion, isCubieInLayer, createDaisyShuffledSetup } from '../../engine/rotationPhysics';
 import { soundEngine } from '../../engine/soundEffects';
 import { Face, MoveNotation } from '../../types/cube';
 
 export interface RubiksCubeRef {
   executeMove: (notation: MoveNotation, duration?: number) => Promise<void>;
   resetToSolved: () => void;
-  resetToDaisy: () => Promise<void>;
+  resetToDaisy: (randomize?: boolean) => void;
   applyScramble: (moves: MoveNotation[]) => Promise<void>;
   isAnimating: () => boolean;
 }
@@ -229,7 +229,7 @@ export const RubiksCube3D = forwardRef<RubiksCubeRef, RubiksCube3DProps>(
         pivot.rotation.set(0, 0, 0);
         pivot.quaternion.identity();
       },
-      resetToDaisy: async () => {
+      resetToDaisy: (randomize = false) => {
         moveQueue.current = [];
         animationState.current.isBusy = false;
 
@@ -237,27 +237,21 @@ export const RubiksCube3D = forwardRef<RubiksCubeRef, RubiksCube3DProps>(
         const pivot = pivotRef.current;
         if (!cubeGroup || !pivot) return;
 
-        cubieRefs.current.forEach((cubie, id) => {
-          if (!cubie) return;
-          cubeGroup.attach(cubie);
-          const [x, y, z] = id.split('_').map(Number);
-          cubie.position.set(x, y, z);
-          cubie.rotation.set(0, 0, 0);
-          cubie.quaternion.identity();
-          cubie.updateMatrixWorld();
-        });
-
         pivot.rotation.set(0, 0, 0);
         pivot.quaternion.identity();
 
-        // Perform F2, R2, B2, L2 with duration 0 to position the 4 white edges around the yellow center
-        const daisyMoves: MoveNotation[] = ['F2', 'R2', 'B2', 'L2'];
-        for (const move of daisyMoves) {
-          await new Promise<void>((res) => {
-            moveQueue.current.push({ notation: move, duration: 0, resolve: res });
-            processNextMove();
-          });
-        }
+        const setupMap = createDaisyShuffledSetup(randomize);
+
+        cubieRefs.current.forEach((cubie, id) => {
+          if (!cubie) return;
+          cubeGroup.attach(cubie);
+          const target = setupMap.get(id);
+          if (target) {
+            cubie.position.set(...target.position);
+            cubie.quaternion.copy(target.quaternion);
+            cubie.updateMatrixWorld();
+          }
+        });
       },
       applyScramble: async (moves: MoveNotation[]) => {
         moveQueue.current = [];
