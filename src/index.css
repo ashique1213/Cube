@@ -53,3 +53,96 @@
 .shadow-glow-purple {
   box-shadow: 0 0 20px -3px rgba(139, 92, 246, 0.3);
 }
+
+/* Poki-style tactile 3D game button press effects */
+.btn-game-orange {
+  box-shadow: 0 3px 0 #c2410c;
+  transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-game-orange:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(3px);
+}
+
+.btn-game-blue {
+  box-shadow: 0 3px 0 #1d4ed8;
+  transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-game-blue:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(3px);
+}
+
+.btn-game-slate {
+  box-shadow: 0 2.5px 0 #cbd5e1;
+  transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-game-slate:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2.5px);
+}
+
+.btn-game-rose {
+  box-shadow: 0 2.5px 0 #fda4af;
+  transition: all 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-game-rose:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2.5px);
+}
+
+/* Color-coded face turn tactile 3D buttons */
+.btn-face-u {
+  box-shadow: 0 2px 0 #fcd34d;
+  transition: all 0.06s ease;
+}
+.btn-face-u:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+
+.btn-face-d {
+  box-shadow: 0 2px 0 #cbd5e1;
+  transition: all 0.06s ease;
+}
+.btn-face-d:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+
+.btn-face-r {
+  box-shadow: 0 2px 0 #fca5a5;
+  transition: all 0.06s ease;
+}
+.btn-face-r:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+
+.btn-face-l {
+  box-shadow: 0 2px 0 #fdba74;
+  transition: all 0.06s ease;
+}
+.btn-face-l:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+
+.btn-face-f {
+  box-shadow: 0 2px 0 #6ee7b7;
+  transition: all 0.06s ease;
+}
+.btn-face-f:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+
+.btn-face-b {
+  box-shadow: 0 2px 0 #93c5fd;
+  transition: all 0.06s ease;
+}
+.btn-face-b:active {
+  box-shadow: 0 0 0 transparent;
+  transform: translateY(2px);
+}
+

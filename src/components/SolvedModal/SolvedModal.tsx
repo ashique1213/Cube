@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Trophy, RotateCcw, X, CheckCircle2 } from 'lucide-react';
+import { Trophy, RotateCcw, X, CheckCircle2, Award } from 'lucide-react';
 import { soundEngine } from '../../engine/soundEffects';
 
 interface SolvedModalProps {
@@ -9,6 +9,8 @@ interface SolvedModalProps {
   onSolveAgain: () => void;
   timeMs?: number;
   moveCount?: number;
+  isNewBest?: boolean;
+  personalBestMs?: number | null;
 }
 
 export const SolvedModal: React.FC<SolvedModalProps> = ({
@@ -17,15 +19,16 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
   onSolveAgain,
   timeMs = 0,
   moveCount = 0,
+  isNewBest = false,
 }) => {
   useEffect(() => {
     if (isOpen) {
       soundEngine.playVictory();
 
       // Launch vibrant confetti bursts
-      const count = 180;
+      const count = 220;
       const defaults = {
-        origin: { y: 0.7 },
+        origin: { y: 0.65 },
         zIndex: 9999,
       };
 
@@ -64,70 +67,78 @@ export const SolvedModal: React.FC<SolvedModalProps> = ({
   const tps = timeMs > 0 ? (moveCount / (timeMs / 1000)).toFixed(1) : '0.0';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 shadow-2xl text-center space-y-4 text-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="relative w-full max-w-md bg-white border-2 border-indigo-200 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-4 text-slate-800">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Trophy Icon */}
-        <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/30">
-          <Trophy className="w-8 h-8" />
+        {/* Trophy Icon with 3D Ring */}
+        <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-amber-400 via-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-xl shadow-amber-500/35 border-b-4 border-amber-600">
+          <Trophy className="w-9 h-9 sm:w-11 sm:h-11 drop-shadow-sm" />
         </div>
 
-        {/* Congratulatory Text (clean, no emojis) */}
+        {/* Congratulatory Text */}
         <div className="space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs">
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Solved Successfully</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 bg-clip-text text-transparent tracking-tight">
-            Cube Solved!
+          {isNewBest ? (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 animate-bounce">
+              <Award className="w-4 h-4" />
+              <span>NEW PERSONAL BEST!</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-xs">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Cube Solved!</span>
+            </div>
+          )}
+          <h2 className="text-2xl sm:text-3xl font-black bg-gradient-to-r from-slate-950 via-indigo-950 to-blue-900 bg-clip-text text-transparent tracking-tight font-sans">
+            VICTORY!
           </h2>
-          <p className="text-xs text-slate-600">
-            Outstanding! You have manually solved the 3×3 Rubik's Cube with authentic 3D turns.
+          <p className="text-xs sm:text-sm text-slate-600 font-medium">
+            You successfully solved the 3×3 Rubik's Cube with authentic manual turns.
           </p>
         </div>
 
         {/* Solve Stats summary */}
-        <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-xl border border-slate-200/90 text-xs shadow-2xs">
-          <div>
-            <div className="text-slate-500 text-[10px] uppercase font-bold">Solve Time</div>
-            <div className="font-bold text-emerald-700 text-sm font-mono">{formattedTime}</div>
+        <div className="grid grid-cols-3 gap-2 py-3 px-3 bg-gradient-to-b from-slate-50 to-slate-100 rounded-2xl border border-slate-200 text-xs shadow-2xs">
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-[10px] uppercase font-black">Solve Time</span>
+            <span className="font-black text-emerald-700 text-base font-mono mt-0.5">{formattedTime}</span>
           </div>
-          <div>
-            <div className="text-slate-500 text-[10px] uppercase font-bold">Total Moves</div>
-            <div className="font-bold text-blue-700 text-sm font-mono">{moveCount}</div>
+          <div className="flex flex-col border-x border-slate-200">
+            <span className="text-slate-400 text-[10px] uppercase font-black">Total Moves</span>
+            <span className="font-black text-blue-700 text-base font-mono mt-0.5">{moveCount}</span>
           </div>
-          <div>
-            <div className="text-slate-500 text-[10px] uppercase font-bold">Speed (TPS)</div>
-            <div className="font-bold text-slate-900 text-sm font-mono">{tps} /s</div>
+          <div className="flex flex-col">
+            <span className="text-slate-400 text-[10px] uppercase font-black">Speed (TPS)</span>
+            <span className="font-black text-slate-900 text-base font-mono mt-0.5">{tps} /s</span>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="space-y-2 pt-1">
+        {/* Poki Tactile Action Buttons */}
+        <div className="space-y-2.5 pt-1">
           <button
             onClick={onSolveAgain}
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-1.5 active:scale-[0.99] cursor-pointer"
+            className="btn-game-orange w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black text-sm shadow-md shadow-orange-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer select-none"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Shuffle & Solve Again</span>
+            <RotateCcw className="w-4 h-4" />
+            <span>SHUFFLE & SOLVE AGAIN</span>
           </button>
 
           <button
             onClick={onClose}
-            className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-b from-white to-slate-100 hover:from-slate-50 hover:to-slate-200 text-slate-700 hover:text-slate-900 text-xs font-bold transition-all border border-slate-300 shadow-2xs cursor-pointer"
+            className="btn-game-slate w-full py-2.5 px-3 rounded-xl bg-gradient-to-b from-white to-slate-100 text-slate-700 text-xs font-black transition-all border border-slate-300 shadow-2xs cursor-pointer select-none"
           >
-            Inspect 3D Cube
+            INSPECT 3D CUBE
           </button>
         </div>
       </div>
     </div>
   );
 };
+
