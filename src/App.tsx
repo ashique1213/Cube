@@ -286,11 +286,22 @@ export const App: React.FC = () => {
         </div>
       </main>
 
-      {/* 3. Footer (Fixed Height, flex-shrink-0) */}
-      <footer className="flex-shrink-0 w-full border-t border-slate-200/80 py-1.5 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] text-slate-500 bg-white/80 backdrop-blur-sm">
-        <span className="bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 bg-clip-text text-transparent font-bold">
-          CubeSolve • Authentic 3D Rubik's Cube Physics • WebGL & React Three Fiber
+      {/* 3. Footer with Questack Solutions Powered By Link */}
+      <footer className="flex-shrink-0 w-full border-t border-slate-200 py-2 px-3 sm:px-6 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-800 bg-white/95 backdrop-blur-sm font-semibold">
+        <span className="text-slate-900 font-extrabold tracking-tight">
+          CubeSolve • Interactive 3D Rubik's Cube Physics • WebGL & React Three Fiber
         </span>
+        <div className="flex items-center gap-1.5 font-bold">
+          <span className="text-slate-600">Powered by</span>
+          <a
+            href="https://questacksolutions.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-700 hover:text-indigo-950 font-black underline underline-offset-2 decoration-indigo-300 hover:decoration-indigo-700 transition-colors"
+          >
+            Questack Solutions
+          </a>
+        </div>
       </footer>
 
       {/* Modals */}

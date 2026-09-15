@@ -93,16 +93,16 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
   return (
     <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl border-2 border-indigo-100/90 p-2.5 sm:p-3 shadow-md shadow-indigo-500/5 flex flex-col justify-between gap-2 h-full">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-0.5 border-b border-slate-100 pb-1.5">
+      <div className="flex items-center justify-between px-0.5 border-b border-slate-200 pb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 bg-clip-text text-transparent">
+          <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950">
             TURNING CONTROLS
           </span>
-          <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded-full">
+          <span className="text-[9px] font-black text-indigo-900 bg-indigo-100 border border-indigo-300 px-1.5 py-0.2 rounded-full">
             6 Faces
           </span>
         </div>
-        <span className="text-[10px] font-mono text-slate-400 font-bold hidden sm:inline">
+        <span className="text-[10px] font-mono text-slate-700 font-bold hidden sm:inline">
           [U, D, R, L, F, B]
         </span>
       </div>
@@ -112,14 +112,14 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
         {FACE_GROUPS.map((group) => (
           <div
             key={group.face}
-            className="bg-slate-50/90 hover:bg-slate-100/80 transition-colors border border-slate-200/90 rounded-xl p-1.5 sm:p-2 flex flex-col justify-center gap-1 shadow-2xs"
+            className="bg-slate-100/90 hover:bg-slate-200/70 transition-colors border border-slate-300 rounded-xl p-1.5 sm:p-2 flex flex-col justify-center gap-1 shadow-2xs"
           >
             {/* Face Badge */}
             <div className="w-full flex items-center justify-between px-0.5">
-              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wide text-slate-700 truncate">
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wide text-slate-900 truncate">
                 {group.label}
               </span>
-              <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${group.tagColor}`}>
+              <span className={`text-[9px] font-mono font-black px-1.5 py-0.2 rounded border shadow-2xs ${group.tagColor}`}>
                 {group.face}
               </span>
             </div>
@@ -134,8 +134,8 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
                   className={`py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-mono font-black border transition-all cursor-pointer select-none flex flex-col items-center justify-center gap-0.5 ${group.faceClass}`}
                   title={`Turn ${notation} (${shortcut})`}
                 >
-                  <span className="leading-none">{notation}</span>
-                  <span className="text-[7px] sm:text-[8px] font-sans opacity-60 leading-none">
+                  <span className="leading-none text-slate-950 font-black">{notation}</span>
+                  <span className="text-[7px] sm:text-[8px] font-sans font-black text-slate-800 leading-none">
                     {shortcut}
                   </span>
                 </button>
@@ -146,9 +146,9 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
       </div>
 
       {/* Footer hint */}
-      <div className="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] sm:text-[10px] font-bold text-slate-400 px-0.5">
+      <div className="pt-1 border-t border-slate-200 flex items-center justify-between text-[9px] sm:text-[10px] font-black text-slate-700 px-0.5">
         <span>Click button or press Key</span>
-        <span className="text-indigo-600">Shift = Counter-Clockwise</span>
+        <span className="text-indigo-900">Shift = Counter-Clockwise</span>
       </div>
     </div>
   );
