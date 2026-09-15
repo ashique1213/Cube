@@ -380,3 +380,82 @@ export function generateRandomScramble(length = 20): MoveNotation[] {
   return moves;
 }
 
+export interface ViewFaceMapping {
+  U: Face; // which physical face is currently visually UP
+  D: Face; // which physical face is currently visually DOWN
+  R: Face; // which physical face is currently visually RIGHT
+  L: Face; // which physical face is currently visually LEFT
+  F: Face; // which physical face is currently visually FRONT
+  B: Face; // which physical face is currently visually BACK
+}
+
+/**
+ * Dynamically computes which physical face is currently facing UP, DOWN,
+ * RIGHT, LEFT, FRONT, and BACK based on camera position and orientation.
+ */
+export function computeViewFaceMapping(camera: THREE.Camera): ViewFaceMapping {
+  const forward = camera.position.clone().normalize();
+  const right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0).normalize();
+  const up = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1).normalize();
+
+  const faces: { face: Face; vec: THREE.Vector3; opposite: Face }[] = [
+    { face: 'R', vec: new THREE.Vector3(1, 0, 0), opposite: 'L' },
+    { face: 'L', vec: new THREE.Vector3(-1, 0, 0), opposite: 'R' },
+    { face: 'U', vec: new THREE.Vector3(0, 1, 0), opposite: 'D' },
+    { face: 'D', vec: new THREE.Vector3(0, -1, 0), opposite: 'U' },
+    { face: 'F', vec: new THREE.Vector3(0, 0, 1), opposite: 'B' },
+    { face: 'B', vec: new THREE.Vector3(0, 0, -1), opposite: 'F' },
+  ];
+
+  // 1. Find UP (axis with maximum dot product with camera up)
+  let bestUp = faces[0];
+  let maxUpDot = -Infinity;
+  for (const f of faces) {
+    const dot = f.vec.dot(up);
+    if (dot > maxUpDot) {
+      maxUpDot = dot;
+      bestUp = f;
+    }
+  }
+  const physicalU = bestUp.face;
+  const physicalD = bestUp.opposite;
+
+  // 2. Find FRONT among remaining axes (maximum dot with camera forward)
+  const remaining = faces.filter((f) => f.face !== physicalU && f.face !== physicalD);
+  let bestFront = remaining[0];
+  let maxFrontDot = -Infinity;
+  for (const f of remaining) {
+    const dot = f.vec.dot(forward);
+    if (dot > maxFrontDot) {
+      maxFrontDot = dot;
+      bestFront = f;
+    }
+  }
+  const physicalF = bestFront.face;
+  const physicalB = bestFront.opposite;
+
+  // 3. Find RIGHT among remaining 2 axes (maximum dot with camera right)
+  const remainingSides = remaining.filter((f) => f.face !== physicalF && f.face !== physicalB);
+  let bestRight = remainingSides[0];
+  let maxRightDot = -Infinity;
+  for (const f of remainingSides) {
+    const dot = f.vec.dot(right);
+    if (dot > maxRightDot) {
+      maxRightDot = dot;
+      bestRight = f;
+    }
+  }
+  const physicalR = bestRight.face;
+  const physicalL = bestRight.opposite;
+
+  return {
+    U: physicalU,
+    D: physicalD,
+    R: physicalR,
+    L: physicalL,
+    F: physicalF,
+    B: physicalB,
+  };
+}
+
+

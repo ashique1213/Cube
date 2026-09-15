@@ -1,4 +1,4 @@
-import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useRef, useImperativeHandle, forwardRef, useEffect, useCallback } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, ContactShadows } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
@@ -7,6 +7,7 @@ import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, RotateCw } from 'luc
 import { RubiksCube3D, RubiksCubeRef } from './RubiksCube3D';
 import { ViewControls } from './ViewControls';
 import { CameraPreset, Face, MoveNotation } from '../../types/cube';
+import { computeViewFaceMapping, ViewFaceMapping } from '../../engine/rotationPhysics';
 
 export interface CubeCanvasHandle extends RubiksCubeRef {
   setCameraPreset: (preset: CameraPreset) => void;
@@ -19,11 +20,20 @@ interface CubeCanvasProps {
   highlightFaces?: Face[];
   onMoveStart?: (notation: MoveNotation) => void;
   onMoveEnd?: (notation: MoveNotation) => void;
+  onViewMappingChange?: (mapping: ViewFaceMapping) => void;
 }
 
 const CameraRig: React.FC<{
   controlsRef: React.RefObject<OrbitControlsImpl>;
-}> = ({ controlsRef }) => {
+  onCameraChange?: () => void;
+}> = ({ controlsRef, onCameraChange }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onCameraChange?.();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [controlsRef, onCameraChange]);
+
   return (
     <OrbitControls
       ref={controlsRef}
@@ -32,14 +42,26 @@ const CameraRig: React.FC<{
       minDistance={3.2}
       maxDistance={12}
       target={[0, 0, 0]}
+      onChange={onCameraChange}
     />
   );
 };
 
 export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
-  ({ animationSpeedMs = 500, highlightFaces = [], onMoveStart, onMoveEnd }, ref) => {
+  ({ animationSpeedMs = 500, highlightFaces = [], onMoveStart, onMoveEnd, onViewMappingChange }, ref) => {
     const cubeRef = useRef<RubiksCubeRef>(null);
     const controlsRef = useRef<OrbitControlsImpl>(null);
+    const lastMappingKeyRef = useRef<string>('');
+
+    const notifyViewMapping = useCallback(() => {
+      if (!controlsRef.current) return;
+      const mapping = computeViewFaceMapping(controlsRef.current.object);
+      const key = `${mapping.U}_${mapping.D}_${mapping.R}_${mapping.L}_${mapping.F}_${mapping.B}`;
+      if (key !== lastMappingKeyRef.current) {
+        lastMappingKeyRef.current = key;
+        onViewMappingChange?.(mapping);
+      }
+    }, [onViewMappingChange]);
 
     // Closer camera presets to eliminate excess whitespace and make the cube prominent
     const presetPositions: Record<CameraPreset, [number, number, number]> = {
@@ -59,6 +81,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       camera.lookAt(0, 0, 0);
       controlsRef.current.target.set(0, 0, 0);
       controlsRef.current.update();
+      notifyViewMapping();
     };
 
     const handleResetCamera = () => {
@@ -96,6 +119,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       camera.position.copy(target).add(offset);
       camera.lookAt(target);
       controlsRef.current.update();
+      notifyViewMapping();
     };
 
     useImperativeHandle(ref, () => ({
@@ -238,7 +262,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
             onMoveEnd={onMoveEnd}
           />
 
-          <CameraRig controlsRef={controlsRef} />
+          <CameraRig controlsRef={controlsRef} onCameraChange={notifyViewMapping} />
         </Canvas>
       </div>
     );

@@ -4,12 +4,22 @@ import { NotationModal } from './components/Header/NotationModal';
 import { CubeCanvas, CubeCanvasHandle } from './components/RubiksCube/CubeCanvas';
 import { ManualControls } from './components/Controls/ManualControls';
 import { SolvedModal } from './components/SolvedModal/SolvedModal';
-import { MoveNotation } from './types/cube';
-import { getInverseMove, generateRandomScramble } from './engine/rotationPhysics';
+import { MoveNotation, Face } from './types/cube';
+import { getInverseMove, generateRandomScramble, ViewFaceMapping } from './engine/rotationPhysics';
 import { soundEngine } from './engine/soundEffects';
 
 export const App: React.FC = () => {
   const cubeCanvasRef = useRef<CubeCanvasHandle>(null);
+
+  // Dynamic view-relative face mapping (visual U, D, R, L, F, B -> physical faces)
+  const [viewMapping, setViewMapping] = useState<ViewFaceMapping>({
+    U: 'U',
+    D: 'D',
+    R: 'R',
+    L: 'L',
+    F: 'F',
+    B: 'B',
+  });
 
   // Animation and speed
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
@@ -95,9 +105,9 @@ export const App: React.FC = () => {
     };
   }, [isTimerRunning]);
 
-  // Execute a manual move on the 3D cube
+  // Execute a manual move on the 3D cube (translated from visual face to physical face)
   const handleExecuteMove = useCallback(
-    async (notation: MoveNotation) => {
+    async (visualMove: MoveNotation) => {
       if (!cubeCanvasRef.current || isAnimating) return;
 
       // Start timer on ANY manual move if not already running
@@ -107,11 +117,17 @@ export const App: React.FC = () => {
         timerStartRef.current = Date.now() - solveTimeMs;
       }
 
+      // Map visual move face (U, D, R, L, F, B) to the physical face currently oriented there
+      const visualFace = visualMove[0] as Face;
+      const physicalFace = viewMapping[visualFace] || visualFace;
+      const suffix = visualMove.slice(1);
+      const physicalMove = `${physicalFace}${suffix}` as MoveNotation;
+
       setIsAnimating(true);
-      await cubeCanvasRef.current.executeMove(notation, speedMs);
+      await cubeCanvasRef.current.executeMove(physicalMove, speedMs);
       setIsAnimating(false);
 
-      const nextHistory = [...moveHistory, notation];
+      const nextHistory = [...moveHistory, physicalMove];
       setMoveHistory(nextHistory);
 
       // Check if cube is solved
@@ -140,7 +156,7 @@ export const App: React.FC = () => {
         }
       }, 50);
     },
-    [isAnimating, isTimerRunning, moveHistory, personalBestMs, solveTimeMs, speedMs]
+    [isAnimating, isTimerRunning, moveHistory, personalBestMs, solveTimeMs, speedMs, viewMapping]
   );
 
   // Scramble / Shuffle the cube
@@ -271,6 +287,7 @@ export const App: React.FC = () => {
           <CubeCanvas
             ref={cubeCanvasRef}
             animationSpeedMs={speedMs}
+            onViewMappingChange={setViewMapping}
           />
         </div>
 
@@ -282,6 +299,7 @@ export const App: React.FC = () => {
             onUndo={handleUndo}
             canUndo={moveHistory.length > 0}
             isAnimating={isAnimating}
+            viewMapping={viewMapping}
           />
         </div>
       </main>
