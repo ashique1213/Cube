@@ -27,14 +27,14 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-sm sm:text-base md:text-lg font-black tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 bg-clip-text text-transparent truncate">
-              3×3 RUBIK'S CUBE SOLVER
+              3×3 RUBIK'S CUBE SIMULATOR
             </h1>
             <span className="hidden md:inline-flex px-2 py-0.5 text-[9px] font-bold rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-violet-500/10 text-indigo-700 border border-indigo-200/80 uppercase flex-shrink-0 shadow-2xs">
-              Beginner 3D Guide
+              Interactive 3D
             </span>
           </div>
           <p className="text-[10px] sm:text-[11px] text-slate-500 font-medium leading-tight hidden sm:block truncate">
-            Learn to solve the cube step by step with interactive 3D rotations
+            Shuffle and manually solve with realistic 3D physics & live timer
           </p>
         </div>
       </div>

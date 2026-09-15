@@ -2,7 +2,7 @@ import React, { useRef, useImperativeHandle, forwardRef, useEffect, useMemo } fr
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
 import { CubiePiece } from './CubiePiece';
-import { getCubieCoordinates, parseMove, snapVector, snapQuaternion, isCubieInLayer, createDaisyShuffledSetup } from '../../engine/rotationPhysics';
+import { getCubieCoordinates, parseMove, snapVector, snapQuaternion, isCubieInLayer, createDaisyShuffledSetup, checkCubeIsSolved } from '../../engine/rotationPhysics';
 import { soundEngine } from '../../engine/soundEffects';
 import { Face, MoveNotation } from '../../types/cube';
 
@@ -12,6 +12,7 @@ export interface RubiksCubeRef {
   resetToDaisy: (randomize?: boolean) => void;
   applyScramble: (moves: MoveNotation[]) => Promise<void>;
   isAnimating: () => boolean;
+  checkIsSolved: () => boolean;
 }
 
 interface RubiksCube3DProps {
@@ -263,6 +264,7 @@ export const RubiksCube3D = forwardRef<RubiksCubeRef, RubiksCube3DProps>(
         }
       },
       isAnimating: () => animationState.current.isBusy || moveQueue.current.length > 0,
+      checkIsSolved: () => checkCubeIsSolved(cubieRefs.current),
     }));
 
     // Reset when component mounts to guarantee clean state

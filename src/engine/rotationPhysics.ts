@@ -314,3 +314,69 @@ export function createDaisyShuffledSetup(randomize = false): Map<string, CubieTr
 
   return setup;
 }
+
+// Check if all 27 cubies are at their home positions with identity orientation
+export function checkCubeIsSolved(cubieMap: Map<string, THREE.Object3D>): boolean {
+  if (cubieMap.size < 26) return false;
+  for (const [id, cubie] of cubieMap.entries()) {
+    if (!cubie) return false;
+    const [hx, hy, hz] = id.split('_').map(Number);
+    const pos = cubie.position;
+    if (
+      Math.abs(Math.round(pos.x) - hx) > 0.15 ||
+      Math.abs(Math.round(pos.y) - hy) > 0.15 ||
+      Math.abs(Math.round(pos.z) - hz) > 0.15
+    ) {
+      return false;
+    }
+
+    // Check that primary normal vectors map to identity
+    const vX = new THREE.Vector3(1, 0, 0).applyQuaternion(cubie.quaternion);
+    const vY = new THREE.Vector3(0, 1, 0).applyQuaternion(cubie.quaternion);
+    const vZ = new THREE.Vector3(0, 0, 1).applyQuaternion(cubie.quaternion);
+
+    if (
+      Math.abs(vX.x - 1) > 0.15 ||
+      Math.abs(vY.y - 1) > 0.15 ||
+      Math.abs(vZ.z - 1) > 0.15
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Standard WCA-style random 20-move scramble generator
+const SCRAMBLE_FACES: Face[] = ['U', 'D', 'R', 'L', 'F', 'B'];
+const SCRAMBLE_MODS = ['', "'", '2'] as const;
+
+function areOppositeFaces(f1: Face, f2: Face): boolean {
+  return (
+    (f1 === 'U' && f2 === 'D') || (f1 === 'D' && f2 === 'U') ||
+    (f1 === 'R' && f2 === 'L') || (f1 === 'L' && f2 === 'R') ||
+    (f1 === 'F' && f2 === 'B') || (f1 === 'B' && f2 === 'F')
+  );
+}
+
+export function generateRandomScramble(length = 20): MoveNotation[] {
+  const moves: MoveNotation[] = [];
+  let lastFace: Face | null = null;
+  let secondLastFace: Face | null = null;
+
+  for (let i = 0; i < length; i++) {
+    let face: Face;
+    do {
+      face = SCRAMBLE_FACES[Math.floor(Math.random() * SCRAMBLE_FACES.length)];
+    } while (
+      face === lastFace ||
+      (secondLastFace && face === secondLastFace && areOppositeFaces(face, lastFace!))
+    );
+
+    const mod = SCRAMBLE_MODS[Math.floor(Math.random() * SCRAMBLE_MODS.length)];
+    moves.push(`${face}${mod}` as MoveNotation);
+    secondLastFace = lastFace;
+    lastFace = face;
+  }
+  return moves;
+}
+

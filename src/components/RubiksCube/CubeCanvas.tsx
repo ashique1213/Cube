@@ -78,6 +78,9 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       isAnimating: () => {
         return cubeRef.current?.isAnimating() ?? false;
       },
+      checkIsSolved: () => {
+        return cubeRef.current?.checkIsSolved() ?? false;
+      },
       setCameraPreset: handleCameraPreset,
       resetCamera: handleResetCamera,
     }));

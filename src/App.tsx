@@ -2,39 +2,33 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Header } from './components/Header/Header';
 import { NotationModal } from './components/Header/NotationModal';
 import { CubeCanvas, CubeCanvasHandle } from './components/RubiksCube/CubeCanvas';
-import { StepPanel } from './components/StepPanel/StepPanel';
+import { SolveStatsBar } from './components/Controls/SolveStatsBar';
 import { ManualControls } from './components/Controls/ManualControls';
 import { SolvedModal } from './components/SolvedModal/SolvedModal';
-import { SOLVING_STEPS } from './data/solvingSteps';
 import { MoveNotation } from './types/cube';
-import { getInverseMove } from './engine/rotationPhysics';
+import { getInverseMove, generateRandomScramble } from './engine/rotationPhysics';
 import { soundEngine } from './engine/soundEffects';
 
 export const App: React.FC = () => {
   const cubeCanvasRef = useRef<CubeCanvasHandle>(null);
 
-  // Solving step state
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [currentMoveIndex, setCurrentMoveIndex] = useState<number>(-1);
-
-  // Playback & Animation states
+  // Animation and speed
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const [isPlayingAlgorithm, setIsPlayingAlgorithm] = useState<boolean>(false);
-  const isPlayingRef = useRef<boolean>(false);
-  isPlayingRef.current = isPlayingAlgorithm;
-
-  // Sound & Speed
-  const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
   const [speedMs, setSpeedMs] = useState<number>(500);
+  const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
+
+  // Move history for undo and count
+  const [moveHistory, setMoveHistory] = useState<MoveNotation[]>([]);
+
+  // Solve Stopwatch Timer state
+  const [solveTimeMs, setSolveTimeMs] = useState<number>(0);
+  const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
+  const [isTimerArmed, setIsTimerArmed] = useState<boolean>(false);
+  const timerStartRef = useRef<number | null>(null);
 
   // Modals
   const [isNotationOpen, setIsNotationOpen] = useState<boolean>(false);
   const [isSolvedModalOpen, setIsSolvedModalOpen] = useState<boolean>(false);
-
-  // Move history for undo
-  const [moveHistory, setMoveHistory] = useState<MoveNotation[]>([]);
-
-  const currentStep = SOLVING_STEPS[currentStepIndex];
 
   // Toggle procedural audio
   const handleToggleSound = () => {
@@ -43,184 +37,129 @@ export const App: React.FC = () => {
     soundEngine.enabled = next;
   };
 
-  // Execute a single move on the 3D cube
-  const executeSingleMove = useCallback(
-    async (notation: MoveNotation, duration = speedMs): Promise<void> => {
-      if (!cubeCanvasRef.current) return;
+  // Live Timer Interval
+  useEffect(() => {
+    let interval: number | undefined;
+    if (isTimerRunning && timerStartRef.current !== null) {
+      interval = window.setInterval(() => {
+        if (timerStartRef.current !== null) {
+          setSolveTimeMs(Date.now() - timerStartRef.current);
+        }
+      }, 30);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerRunning]);
+
+  // Execute a manual move on the 3D cube
+  const handleExecuteMove = useCallback(
+    async (notation: MoveNotation) => {
+      if (!cubeCanvasRef.current || isAnimating) return;
+
+      // Start timer on user's first move if armed
+      if (isTimerArmed && !isTimerRunning) {
+        setIsTimerArmed(false);
+        setIsTimerRunning(true);
+        timerStartRef.current = Date.now();
+      }
+
       setIsAnimating(true);
-      await cubeCanvasRef.current.executeMove(notation, duration);
+      await cubeCanvasRef.current.executeMove(notation, speedMs);
       setIsAnimating(false);
-      setMoveHistory((prev) => [...prev, notation]);
+
+      const nextHistory = [...moveHistory, notation];
+      setMoveHistory(nextHistory);
+
+      // Check if cube is solved
+      setTimeout(() => {
+        const solved = cubeCanvasRef.current?.checkIsSolved();
+        if (solved) {
+          setIsTimerRunning(false);
+          setIsTimerArmed(false);
+          setIsSolvedModalOpen(true);
+        }
+      }, 50);
     },
-    [speedMs]
+    [isAnimating, isTimerArmed, isTimerRunning, moveHistory, speedMs]
   );
 
-  // Step-by-step single move execution ("Next Move →")
-  const handleNextMove = useCallback(async () => {
-    if (isAnimating || isPlayingAlgorithm) return;
-    const nextIdx = currentMoveIndex + 1;
-    if (nextIdx < currentStep.moves.length) {
-      const move = currentStep.moves[nextIdx];
-      setCurrentMoveIndex(nextIdx);
-      await executeSingleMove(move);
-
-      // If this was the last move of Step 9, advance to solved step!
-      if (currentStep.id === 9 && nextIdx === currentStep.moves.length - 1) {
-        setTimeout(() => {
-          setCurrentStepIndex(9);
-          setIsSolvedModalOpen(true);
-        }, 300);
-      }
-    }
-  }, [currentMoveIndex, currentStep, isAnimating, isPlayingAlgorithm, executeSingleMove]);
-
-  // "Play Full Algorithm" playback runner
-  const handlePlayFullAlgorithm = useCallback(async () => {
-    if (isPlayingAlgorithm) {
-      isPlayingRef.current = false;
-      setIsPlayingAlgorithm(false);
-      return;
-    }
-
-    if (currentStep.moves.length === 0) return;
-
-    isPlayingRef.current = true;
-    setIsPlayingAlgorithm(true);
-
-    let startIdx = currentMoveIndex + 1;
-    if (startIdx >= currentStep.moves.length) {
-      startIdx = 0;
-    }
-
-    for (let i = startIdx; i < currentStep.moves.length; i++) {
-      if (!isPlayingRef.current) {
-        break;
-      }
-
-      setCurrentMoveIndex(i);
-      const move = currentStep.moves[i];
-      await executeSingleMove(move, speedMs);
-
-      if (i < currentStep.moves.length - 1 && isPlayingRef.current) {
-        await new Promise((res) => setTimeout(res, Math.max(60, speedMs * 0.2)));
-      }
-    }
-
-    isPlayingRef.current = false;
-    setIsPlayingAlgorithm(false);
-
-    if (currentStep.id === 9 && isPlayingRef.current) {
-      setTimeout(() => {
-        setCurrentStepIndex(9);
-        setIsSolvedModalOpen(true);
-      }, 400);
-    }
-  }, [isPlayingAlgorithm, currentStep, currentMoveIndex, executeSingleMove, speedMs]);
-
-  // Set up cube in the exact stage matching the step
-  const setupStepState = useCallback(async (stepIndex: number) => {
-    if (!cubeCanvasRef.current) return;
-    const step = SOLVING_STEPS[stepIndex];
-    if (stepIndex === 0 || stepIndex === 1) {
-      // Steps 1 & 2: Daisy on top
-      cubeCanvasRef.current.resetToDaisy(false);
-    } else if (stepIndex === 9) {
-      // Step 10: 100% Solved
-      cubeCanvasRef.current.resetToSolved();
-    } else if (step.setupScramble && step.setupScramble.length > 0) {
-      cubeCanvasRef.current.resetToSolved();
-      await cubeCanvasRef.current.applyScramble(step.setupScramble);
-    }
-  }, []);
-
-  // Reset current step moves (re-stages this exact step)
-  const handleResetStep = useCallback(async () => {
+  // Scramble / Shuffle the cube
+  const handleScramble = useCallback(async () => {
     if (isAnimating) return;
-    isPlayingRef.current = false;
-    setIsPlayingAlgorithm(false);
-    setCurrentMoveIndex(-1);
-    await setupStepState(currentStepIndex);
-  }, [isAnimating, currentStepIndex, setupStepState]);
 
-  // Step change navigation
-  const handleStepChange = useCallback(async (newIndex: number) => {
-    if (newIndex < 0 || newIndex >= SOLVING_STEPS.length) return;
-    isPlayingRef.current = false;
-    setIsPlayingAlgorithm(false);
-    setCurrentMoveIndex(-1);
-    setCurrentStepIndex(newIndex);
-    await setupStepState(newIndex);
-
-    if (newIndex === 9) {
-      setIsSolvedModalOpen(true);
-    }
-  }, [setupStepState]);
-
-  // Global Scramble (On Step 1, keeps top Daisy and shuffles all other sides)
-  const handleScrambleCube = useCallback(async () => {
-    if (isAnimating || isPlayingAlgorithm) return;
-    isPlayingRef.current = false;
-    setIsPlayingAlgorithm(false);
-    setCurrentMoveIndex(-1);
-
-    if (currentStepIndex === 0 || currentStepIndex === 1) {
-      // Re-scramble other sides while preserving the top White Cross around Yellow Center
-      cubeCanvasRef.current?.resetToDaisy(true);
-    } else {
-      const moves: MoveNotation[] = [
-        'R', 'U', "R'", "U'", 'L', 'F', "L'", "F'",
-        'D2', 'R2', 'B', "U'", 'B2', 'L2', 'D', "R'"
-      ];
-      await cubeCanvasRef.current?.applyScramble(moves);
-    }
+    // Reset timer and state
+    setIsTimerRunning(false);
+    timerStartRef.current = null;
+    setSolveTimeMs(0);
     setMoveHistory([]);
-  }, [isAnimating, isPlayingAlgorithm, currentStepIndex]);
 
-  // Reset cube to the authentic starting state of the current step
-  const handleResetCube = useCallback(async () => {
-    isPlayingRef.current = false;
-    setIsPlayingAlgorithm(false);
-    setCurrentMoveIndex(-1);
+    const scrambleMoves = generateRandomScramble(20);
+
+    setIsAnimating(true);
+    await cubeCanvasRef.current?.applyScramble(scrambleMoves);
+    setIsAnimating(false);
+
+    // Arm the timer so it starts when the user makes their first manual move
+    setIsTimerArmed(true);
+  }, [isAnimating]);
+
+  // Reset cube to clean solved state
+  const handleReset = useCallback(() => {
+    setIsTimerRunning(false);
+    setIsTimerArmed(false);
+    timerStartRef.current = null;
+    setSolveTimeMs(0);
     setMoveHistory([]);
-    await setupStepState(currentStepIndex);
-  }, [currentStepIndex, setupStepState]);
-
-  // Start with White Cross around Yellow Center by default
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setupStepState(0);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [setupStepState]);
+    cubeCanvasRef.current?.resetToSolved();
+  }, []);
 
   // Undo last move
   const handleUndo = useCallback(async () => {
     if (isAnimating || moveHistory.length === 0) return;
-    const last = moveHistory[moveHistory.length - 1];
-    const inv = getInverseMove(last);
-    await executeSingleMove(inv);
-    setMoveHistory((prev) => prev.slice(0, -2));
-  }, [isAnimating, moveHistory, executeSingleMove]);
+    const lastMove = moveHistory[moveHistory.length - 1];
+    const inverse = getInverseMove(lastMove);
+
+    setIsAnimating(true);
+    await cubeCanvasRef.current?.executeMove(inverse, speedMs);
+    setIsAnimating(false);
+
+    setMoveHistory((prev) => prev.slice(0, -1));
+  }, [isAnimating, moveHistory, speedMs]);
+
+  // Start with clean solved cube by default
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      cubeCanvasRef.current?.resetToSolved();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
 
+      const key = e.key.toUpperCase();
+
       if (e.code === 'Space') {
         e.preventDefault();
-        handlePlayFullAlgorithm();
-      } else if (e.code === 'ArrowRight' && !e.shiftKey) {
-        e.preventDefault();
-        handleNextMove();
+        handleScramble();
       } else if (e.code === 'KeyN') {
         setIsNotationOpen((prev) => !prev);
+      } else if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        handleUndo();
+      } else if (['U', 'D', 'R', 'L', 'F', 'B'].includes(key)) {
+        e.preventDefault();
+        const notation = (e.shiftKey ? `${key}'` : key) as MoveNotation;
+        handleExecuteMove(notation);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handlePlayFullAlgorithm, handleNextMove]);
+  }, [handleExecuteMove, handleScramble, handleUndo]);
 
   return (
     <div className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-gradient-to-br from-slate-50 via-sky-50/15 to-indigo-50/25 text-slate-900 flex flex-col lg:overflow-hidden font-sans select-none relative">
@@ -228,59 +167,50 @@ export const App: React.FC = () => {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* 1. Responsive Header (Fixed Height, flex-shrink-0) */}
+      {/* 1. Header (Fixed Height, flex-shrink-0) */}
       <Header
         onOpenNotation={() => setIsNotationOpen(true)}
-        onResetCube={handleResetCube}
-        onScrambleCube={handleScrambleCube}
+        onResetCube={handleReset}
+        onScrambleCube={handleScramble}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
-        currentStepId={currentStep.id}
       />
 
-      {/* 2. Main Area (Adaptive on mobile, strict viewport fit on desktop) */}
-      <main className="flex-1 w-full max-w-[1600px] mx-auto p-2 sm:p-2.5 md:p-3 flex flex-col gap-2 lg:min-h-0">
-        {/* Top Split: 3D Cube Canvas (Left) + Step Guidance Panel (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-2.5 items-stretch flex-1 lg:min-h-0">
-          {/* Left: 3D Rubik's Cube (7 cols on desktop) */}
-          <div className="lg:col-span-7 h-[330px] sm:h-[400px] lg:h-full min-h-[280px] flex flex-col flex-shrink-0 lg:flex-shrink">
-            <CubeCanvas
-              ref={cubeCanvasRef}
-              animationSpeedMs={speedMs}
-              highlightFaces={currentStep.highlightFaces}
-            />
-          </div>
-
-          {/* Right: Step Guidance & Algorithm Panel (5 cols on desktop) */}
-          <div className="lg:col-span-5 h-auto lg:h-full lg:min-h-0 flex flex-col lg:overflow-hidden">
-            <StepPanel
-              step={currentStep}
-              currentStepIndex={currentStepIndex}
-              onStepChange={handleStepChange}
-              currentMoveIndex={currentMoveIndex}
-              isPlayingAlgorithm={isPlayingAlgorithm}
-              isAnimating={isAnimating}
-              onPlayFullAlgorithm={handlePlayFullAlgorithm}
-              onNextMove={handleNextMove}
-              onResetStep={handleResetStep}
-              speedMs={speedMs}
-              onSpeedChange={setSpeedMs}
-              onSolveAgain={() => {
-                handleResetCube();
-                handleStepChange(0);
-              }}
-            />
-          </div>
+      {/* 2. Main Area (Prominent Centered 3D Cube with Stats & Manual Controls) */}
+      <main className="flex-1 w-full max-w-[1400px] mx-auto p-2 sm:p-2.5 md:p-3 flex flex-col gap-2 lg:min-h-0">
+        {/* Top Control & Stats Bar: Shuffle, Live Timer, Moves, Reset, Undo, Speed */}
+        <div className="flex-shrink-0 w-full">
+          <SolveStatsBar
+            timeMs={solveTimeMs}
+            isTimerRunning={isTimerRunning}
+            isTimerArmed={isTimerArmed}
+            moveCount={moveHistory.length}
+            canUndo={moveHistory.length > 0}
+            isAnimating={isAnimating}
+            onScramble={handleScramble}
+            onReset={handleReset}
+            onUndo={handleUndo}
+            speedMs={speedMs}
+            onSpeedChange={setSpeedMs}
+          />
         </div>
 
-        {/* Bottom Section: Manual Face Turn Controls (flex-shrink-0) */}
+        {/* Center: Interactive 3D Rubik's Cube */}
+        <div className="flex-1 w-full min-h-[300px] sm:min-h-[380px] lg:min-h-0 flex flex-col items-center justify-center">
+          <CubeCanvas
+            ref={cubeCanvasRef}
+            animationSpeedMs={speedMs}
+          />
+        </div>
+
+        {/* Bottom Section: Color-Matched Manual Face Turn Controls (flex-shrink-0) */}
         <div className="flex-shrink-0 w-full">
           <ManualControls
-            onExecuteMove={(move) => executeSingleMove(move)}
-            onReset={handleResetCube}
+            onExecuteMove={handleExecuteMove}
+            onReset={handleReset}
             onUndo={handleUndo}
             canUndo={moveHistory.length > 0}
-            isAnimating={isAnimating || isPlayingAlgorithm}
+            isAnimating={isAnimating}
           />
         </div>
       </main>
@@ -288,7 +218,7 @@ export const App: React.FC = () => {
       {/* 3. Footer (Fixed Height, flex-shrink-0) */}
       <footer className="flex-shrink-0 w-full border-t border-slate-200/80 py-1.5 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] text-slate-500 bg-white/80 backdrop-blur-sm">
         <span className="bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 bg-clip-text text-transparent font-medium">
-          Interactive 3D Rubik's Cube Solver • Beginner Layer-by-Layer Method • Three.js & React Three Fiber
+          Interactive 3D Rubik's Cube Simulator • Real 3D Physical Rotations • Three.js & React Three Fiber
         </span>
       </footer>
 
@@ -296,7 +226,7 @@ export const App: React.FC = () => {
       <NotationModal
         isOpen={isNotationOpen}
         onClose={() => setIsNotationOpen(false)}
-        onTestMove={(move) => executeSingleMove(move)}
+        onTestMove={handleExecuteMove}
       />
 
       <SolvedModal
@@ -304,9 +234,10 @@ export const App: React.FC = () => {
         onClose={() => setIsSolvedModalOpen(false)}
         onSolveAgain={() => {
           setIsSolvedModalOpen(false);
-          handleResetCube();
-          handleStepChange(0);
+          handleScramble();
         }}
+        timeMs={solveTimeMs}
+        moveCount={moveHistory.length}
       />
     </div>
   );
