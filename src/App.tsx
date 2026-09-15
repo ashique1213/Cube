@@ -69,6 +69,17 @@ export const App: React.FC = () => {
     soundEngine.enabled = next;
   };
 
+  // Toggle timer manually (Start / Pause / Resume)
+  const handleToggleTimer = useCallback(() => {
+    if (isTimerRunning) {
+      setIsTimerRunning(false);
+    } else {
+      setIsTimerRunning(true);
+      setIsTimerArmed(false);
+      timerStartRef.current = Date.now() - solveTimeMs;
+    }
+  }, [isTimerRunning, solveTimeMs]);
+
   // Live Timer Interval
   useEffect(() => {
     let interval: number | undefined;
@@ -89,11 +100,11 @@ export const App: React.FC = () => {
     async (notation: MoveNotation) => {
       if (!cubeCanvasRef.current || isAnimating) return;
 
-      // Start timer on user's first move if armed
-      if (isTimerArmed && !isTimerRunning) {
-        setIsTimerArmed(false);
+      // Start timer on ANY manual move if not already running
+      if (!isTimerRunning) {
         setIsTimerRunning(true);
-        timerStartRef.current = Date.now();
+        setIsTimerArmed(false);
+        timerStartRef.current = Date.now() - solveTimeMs;
       }
 
       setIsAnimating(true);
@@ -129,7 +140,7 @@ export const App: React.FC = () => {
         }
       }, 50);
     },
-    [isAnimating, isTimerArmed, isTimerRunning, moveHistory, personalBestMs, solveTimeMs, speedMs]
+    [isAnimating, isTimerRunning, moveHistory, personalBestMs, solveTimeMs, speedMs]
   );
 
   // Scramble / Shuffle the cube
@@ -149,7 +160,7 @@ export const App: React.FC = () => {
     await cubeCanvasRef.current?.applyScramble(scrambleMoves);
     setIsAnimating(false);
 
-    // Arm the timer so it starts when the user makes their first manual move
+    // Arm the timer so it is ready and starts on the user's first move
     setIsTimerArmed(true);
   }, [isAnimating]);
 
@@ -202,6 +213,18 @@ export const App: React.FC = () => {
       } else if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         handleUndo();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        cubeCanvasRef.current?.rotateView('left');
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        cubeCanvasRef.current?.rotateView('right');
+      } else if (e.code === 'ArrowUp') {
+        e.preventDefault();
+        cubeCanvasRef.current?.rotateView('up');
+      } else if (e.code === 'ArrowDown') {
+        e.preventDefault();
+        cubeCanvasRef.current?.rotateView('down');
       } else if (['U', 'D', 'R', 'L', 'F', 'B'].includes(key)) {
         e.preventDefault();
         const notation = (e.shiftKey ? `${key}'` : key) as MoveNotation;
@@ -224,6 +247,7 @@ export const App: React.FC = () => {
         timeMs={solveTimeMs}
         isTimerRunning={isTimerRunning}
         isTimerArmed={isTimerArmed}
+        onToggleTimer={handleToggleTimer}
         personalBestMs={personalBestMs}
         moveCount={moveHistory.length}
         canUndo={moveHistory.length > 0}
@@ -240,10 +264,10 @@ export const App: React.FC = () => {
         onToggleFullscreen={handleToggleFullscreen}
       />
 
-      {/* 2. Main Area with balanced side margins: Left 3D Cube Canvas, Right Turning Controls */}
-      <main className="flex-1 w-full max-w-[1550px] mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-4 flex flex-col lg:flex-row gap-4 lg:gap-6 lg:min-h-0 overflow-y-auto lg:overflow-hidden items-stretch">
-        {/* Left: Interactive 3D Rubik's Cube Canvas */}
-        <div className="flex-1 min-h-[360px] sm:min-h-[420px] lg:min-h-0 bg-white/70 backdrop-blur-xs rounded-3xl border-2 border-indigo-100/90 shadow-sm relative overflow-hidden flex flex-col items-center justify-center">
+      {/* 2. Main Area: Clean, tight margins, Left 3D Cube Canvas, Right Turning Controls */}
+      <main className="flex-1 w-full max-w-[1750px] mx-auto px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 flex flex-col lg:flex-row gap-2 sm:gap-2.5 lg:min-h-0 overflow-y-auto lg:overflow-hidden items-stretch">
+        {/* Left: Interactive 3D Rubik's Cube Canvas (maximum space, minimal dead whitespace) */}
+        <div className="flex-1 min-h-[360px] sm:min-h-[420px] lg:min-h-0 bg-white/70 backdrop-blur-xs rounded-3xl border border-indigo-100/90 shadow-sm relative overflow-hidden flex flex-col items-center justify-center">
           <CubeCanvas
             ref={cubeCanvasRef}
             animationSpeedMs={speedMs}
@@ -251,7 +275,7 @@ export const App: React.FC = () => {
         </div>
 
         {/* Right: Turning Option Controls */}
-        <div className="w-full lg:w-[380px] xl:w-[430px] flex-shrink-0 flex flex-col">
+        <div className="w-full lg:w-[360px] xl:w-[400px] flex-shrink-0 flex flex-col">
           <ManualControls
             onExecuteMove={handleExecuteMove}
             onReset={handleReset}

@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, ContactShadows } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
 import { RubiksCube3D, RubiksCubeRef } from './RubiksCube3D';
 import { ViewControls } from './ViewControls';
 import { CameraPreset, Face, MoveNotation } from '../../types/cube';
@@ -10,6 +11,7 @@ import { CameraPreset, Face, MoveNotation } from '../../types/cube';
 export interface CubeCanvasHandle extends RubiksCubeRef {
   setCameraPreset: (preset: CameraPreset) => void;
   resetCamera: () => void;
+  rotateView: (direction: 'left' | 'right' | 'up' | 'down') => void;
 }
 
 interface CubeCanvasProps {
@@ -27,8 +29,8 @@ const CameraRig: React.FC<{
       ref={controlsRef}
       enableDamping
       dampingFactor={0.08}
-      minDistance={4.5}
-      maxDistance={14}
+      minDistance={3.2}
+      maxDistance={12}
       target={[0, 0, 0]}
     />
   );
@@ -39,13 +41,14 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
     const cubeRef = useRef<RubiksCubeRef>(null);
     const controlsRef = useRef<OrbitControlsImpl>(null);
 
+    // Closer camera presets to eliminate excess whitespace and make the cube prominent
     const presetPositions: Record<CameraPreset, [number, number, number]> = {
-      isometric: [4.2, 5.0, 5.2],
-      front: [0, 0, 7.5],
-      top: [0, 7.5, 0.001],
-      right: [7.5, 0, 0],
-      back: [0, 0, -7.5],
-      bottom: [0, -7.5, 0.001],
+      isometric: [2.9, 3.4, 3.6],
+      front: [0, 0, 4.8],
+      top: [0, 4.8, 0.001],
+      right: [4.8, 0, 0],
+      back: [0, 0, -4.8],
+      bottom: [0, -4.8, 0.001],
     };
 
     const handleCameraPreset = (preset: CameraPreset) => {
@@ -60,6 +63,39 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
 
     const handleResetCamera = () => {
       handleCameraPreset('isometric');
+    };
+
+    // Rotate the whole cube / camera view in 4 directions
+    const rotateView = (direction: 'left' | 'right' | 'up' | 'down') => {
+      if (!controlsRef.current) return;
+      const camera = controlsRef.current.object;
+      const target = controlsRef.current.target;
+
+      const offset = camera.position.clone().sub(target);
+      const radius = offset.length();
+      let theta = Math.atan2(offset.x, offset.z);
+      let phi = Math.acos(Math.max(-0.99, Math.min(0.99, offset.y / radius)));
+
+      const stepAzimuth = Math.PI / 4; // 45° rotation around Y
+      const stepPolar = Math.PI / 6; // 30° tilt
+
+      if (direction === 'left') {
+        theta += stepAzimuth;
+      } else if (direction === 'right') {
+        theta -= stepAzimuth;
+      } else if (direction === 'up') {
+        phi = Math.max(0.15, phi - stepPolar);
+      } else if (direction === 'down') {
+        phi = Math.min(Math.PI - 0.15, phi + stepPolar);
+      }
+
+      offset.x = radius * Math.sin(phi) * Math.sin(theta);
+      offset.y = radius * Math.cos(phi);
+      offset.z = radius * Math.sin(phi) * Math.cos(theta);
+
+      camera.position.copy(target).add(offset);
+      camera.lookAt(target);
+      controlsRef.current.update();
     };
 
     useImperativeHandle(ref, () => ({
@@ -83,33 +119,82 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
       },
       setCameraPreset: handleCameraPreset,
       resetCamera: handleResetCamera,
+      rotateView: rotateView,
     }));
 
     return (
-      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-2xl overflow-hidden border border-indigo-100/90 shadow-[0_10px_35px_-5px_rgba(99,102,241,0.08)]">
-        {/* Quick View Controls */}
+      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-3xl overflow-hidden border border-indigo-100/90 shadow-sm">
+        {/* Quick View Presets (Top Left) */}
         <ViewControls
           onPresetSelect={handleCameraPreset}
           onResetView={handleResetCamera}
         />
 
-        {/* Orbit Helper Tip */}
-        <div className="absolute bottom-2.5 left-3 z-10 pointer-events-none text-[10px] sm:text-[11px] text-slate-500 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-indigo-100/80 shadow-xs flex items-center gap-1.5 font-medium">
-          <span>Rotate: Click & Drag</span>
-          <span className="text-indigo-300">•</span>
-          <span>Zoom: Scroll</span>
+        {/* 4-Way Tactile Cube Rotation Controller (Bottom Right) */}
+        <div className="absolute bottom-2.5 right-2.5 z-20 flex flex-col items-center gap-0.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-indigo-100 shadow-md">
+          <div className="flex items-center gap-1 text-[8px] font-black uppercase text-indigo-700 tracking-wider mb-0.5">
+            <RotateCw className="w-2.5 h-2.5" />
+            <span>ROTATE CUBE</span>
+          </div>
+
+          <button
+            onClick={() => rotateView('up')}
+            className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+            title="Rotate Up / Top View (Arrow Up)"
+            aria-label="Rotate cube up"
+          >
+            <ChevronUp className="w-4 h-4" />
+          </button>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => rotateView('left')}
+              className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+              title="Rotate Left (Arrow Left)"
+              aria-label="Rotate cube left"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <span className="text-[7px] font-mono font-bold text-slate-400 px-0.5">3D</span>
+
+            <button
+              onClick={() => rotateView('right')}
+              className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+              title="Rotate Right (Arrow Right)"
+              aria-label="Rotate cube right"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <button
+            onClick={() => rotateView('down')}
+            className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+            title="Rotate Down / Bottom View (Arrow Down)"
+            aria-label="Rotate cube down"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* 3D WebGL Canvas */}
+        {/* Orbit Helper Tip (Bottom Left) */}
+        <div className="absolute bottom-2.5 left-2.5 z-10 pointer-events-none text-[9px] sm:text-[10px] text-slate-500 bg-white/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-indigo-100/80 shadow-2xs flex items-center gap-1 font-medium">
+          <span>Drag: Orbit</span>
+          <span className="text-indigo-300">•</span>
+          <span>Arrows: Rotate</span>
+        </div>
+
+        {/* 3D WebGL Canvas with Closer Camera for Maximum Cube Size */}
         <Canvas
           shadows
-          camera={{ position: [4.2, 5.0, 5.2], fov: 42 }}
+          camera={{ position: [2.9, 3.4, 3.6], fov: 38 }}
           gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >
-          {/* Studio Lighting tuned for crisp white theme */}
-          <ambientLight intensity={1.1} />
-          
+          {/* Studio Lighting */}
+          <ambientLight intensity={1.15} />
+
           <directionalLight
             position={[8, 14, 8]}
             intensity={1.8}
@@ -137,11 +222,11 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
 
           {/* Contact Shadows beneath the Rubik's Cube */}
           <ContactShadows
-            position={[0, -2.1, 0]}
+            position={[0, -1.9, 0]}
             opacity={0.35}
-            scale={9}
-            blur={2.0}
-            far={4}
+            scale={7.5}
+            blur={1.8}
+            far={3.5}
           />
 
           {/* 3D Rubik's Cube */}
@@ -161,3 +246,4 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
 );
 
 CubeCanvas.displayName = 'CubeCanvas';
+
