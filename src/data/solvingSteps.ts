@@ -1,4 +1,13 @@
-import { SolvingStep } from '../types/cube';
+import { SolvingStep, MoveNotation } from '../types/cube';
+
+// Exact inverse setup sequences to stage the 3D cube accurately for each step
+const inv9: MoveNotation[] = ['R', "U'", 'R', 'U', 'R', 'U', 'R', "U'", "R'", "U'", 'R2'];
+const inv8: MoveNotation[] = ['R2', 'B2', 'R', 'F', "R'", 'B2', 'R', "F'", 'R'];
+const inv7: MoveNotation[] = ['R', 'U2', "R'", "U'", 'R', "U'", "R'"];
+const inv6: MoveNotation[] = ['F', 'R', 'U', "R'", "U'", "F'"];
+const inv5: MoveNotation[] = ["F'", "U'", 'F', 'U', 'R', 'U', "R'", "U'"];
+const inv4: MoveNotation[] = ['F', 'U', "F'", "U'", "L'", "U'", 'L', 'U'];
+const inv3: MoveNotation[] = ['U', 'R', "U'", "R'"];
 
 export const SOLVING_STEPS: SolvingStep[] = [
   {
@@ -51,29 +60,28 @@ export const SOLVING_STEPS: SolvingStep[] = [
   {
     id: 3,
     title: 'Solve the White Corners',
-    subtitle: "Insert Using R U R' U'",
-    instruction: "Find a white corner. Check its other two colors and find the matching center colors. Example: a white + red + blue corner belongs between the white, red, and blue centers. Put the corner in the correct position. Insert it using: R U R' U'. Repeat until all 4 white corners are solved. Now the complete white layer should be solved.",
+    subtitle: "Hold White on Bottom • Insert Corner using R U R' U'",
+    instruction: "Find a white corner in the top layer. Check its other two colors and position it directly above where it belongs (between matching centers). Keep that target slot at the Front-Right and execute: R U R' U'. Repeat until the corner drops into place facing down and the complete white layer is solved.",
     subInstructions: [
-      'Find a white corner.',
-      'Check its other two colors and find the matching center colors.',
-      'Example: a white + red + blue corner belongs between the white, red, and blue centers.',
-      'Put the corner in the correct position.',
-      "Insert it using: R U R' U'",
-      'Repeat until all 4 white corners are solved.',
-      'Now the complete white layer should be solved.'
+      'Hold the cube so the White cross is on the bottom (Down) and Yellow is on top (Up).',
+      'Find a corner piece with a White sticker in the top layer.',
+      'Check its other two colors: for example, a white + red + green corner belongs between the white, red, and green centers.',
+      'Turn the top (U) face to put that corner directly above its target slot at the Front-Right position.',
+      "Insert it using the Righty Alg: R U R' U' (repeat 1 to 5 times until the white sticker faces down).",
+      'Repeat for all 4 corners until the complete white bottom layer is solved!'
     ],
     algorithm: "R U R' U'",
     moves: ['R', 'U', "R'", "U'"],
-    tip: 'The 4 moves R U R\' U\' are known as the "Righty Alg"—one of the most important sequences in cubing.',
-    warning: 'Keep the corner piece directly in the front-right slot before executing the algorithm.',
+    tip: "R lifts the front-right slot up, U slides the corner in, R' brings the corner down to the bottom, and U' restores the top layer.",
+    warning: 'Always keep the target corner slot directly at the FRONT-RIGHT before running R U R\' U\'.',
     highlightFaces: ['D', 'R', 'F'],
     stageDiagram: [
-      'Corner in Position',
+      'Corner in Top-Right',
       "Apply R U R' U'",
-      'Repeat as Needed',
-      'Complete White Layer'
+      'Corner Drops Down',
+      'First Layer Complete'
     ],
-    setupScramble: ['U', 'R', 'U', "R'", "U'"]
+    setupScramble: [...inv9, ...inv8, ...inv7, ...inv6, ...inv5, ...inv4, ...inv3]
   },
   {
     id: 4,
@@ -97,7 +105,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Insert into Slot',
       'Left Middle Edge Solved'
     ],
-    setupScramble: ['F', 'U', "F'", "U'", "L'", "U'", 'L', 'U']
+    setupScramble: [...inv9, ...inv8, ...inv7, ...inv6, ...inv5, ...inv4]
   },
   {
     id: 5,
@@ -121,7 +129,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Insert into Slot',
       'Both Layers Complete'
     ],
-    setupScramble: ["F'", "U'", 'F', 'U', 'R', 'U', "R'", "U'"]
+    setupScramble: [...inv9, ...inv8, ...inv7, ...inv6, ...inv5]
   },
   {
     id: 6,
@@ -145,7 +153,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Horizontal Line',
       'Yellow Cross on Top'
     ],
-    setupScramble: ['F', 'R', 'U', "R'", "U'", "F'"]
+    setupScramble: [...inv9, ...inv8, ...inv7, ...inv6]
   },
   {
     id: 7,
@@ -169,7 +177,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Apply Algorithm',
       'Entire Top is Yellow'
     ],
-    setupScramble: ['R', 'U2', "R'", "U'", 'R', "U'", "R'"]
+    setupScramble: [...inv9, ...inv8, ...inv7]
   },
   {
     id: 8,
@@ -193,7 +201,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Execute Sequence',
       'All Corners Positioned'
     ],
-    setupScramble: ['R2', 'B2', 'R', 'F', "R'", 'B2', 'R', "F'", 'R']
+    setupScramble: [...inv9, ...inv8]
   },
   {
     id: 9,
@@ -217,7 +225,7 @@ export const SOLVING_STEPS: SolvingStep[] = [
       'Final Alignment',
       'Cube Solved'
     ],
-    setupScramble: ['R', "U'", 'R', 'U', 'R', 'U', 'R', "U'", "R'", "U'", 'R2']
+    setupScramble: [...inv9]
   },
   {
     id: 10,
