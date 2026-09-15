@@ -90,16 +90,8 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
     <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl border-2 border-indigo-100/90 p-2.5 sm:p-3 shadow-md shadow-indigo-500/5 flex flex-col justify-between gap-2 h-full">
       {/* Header bar */}
       <div className="flex items-center justify-between px-0.5 border-b border-slate-200 pb-1.5">
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950">
-            TURNING CONTROLS
-          </span>
-          <span className="text-[9px] font-black text-indigo-900 bg-indigo-100 border border-indigo-300 px-1.5 py-0.2 rounded-full">
-            View-Relative
-          </span>
-        </div>
-        <span className="text-[10px] font-mono text-slate-700 font-bold hidden sm:inline">
-          Adapts on Rotation
+        <span className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-950">
+          TURNING CONTROLS
         </span>
       </div>
 
@@ -156,7 +148,7 @@ export const ManualControls: React.FC<ManualControlsProps> = ({
       {/* Footer hint */}
       <div className="pt-1 border-t border-slate-200 flex items-center justify-between text-[9px] sm:text-[10px] font-black text-slate-700 px-0.5">
         <span>Click button or press Key</span>
-        <span className="text-indigo-900">Touch/Rotate 3D cube to re-orient</span>
+        <span className="text-indigo-900">Shift = Counter-Clockwise</span>
       </div>
     </div>
   );
