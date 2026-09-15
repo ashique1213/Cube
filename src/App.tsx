@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Header } from './components/Header/Header';
 import { NotationModal } from './components/Header/NotationModal';
 import { CubeCanvas, CubeCanvasHandle } from './components/RubiksCube/CubeCanvas';
-import { GameHUD } from './components/Controls/GameHUD';
 import { ManualControls } from './components/Controls/ManualControls';
 import { SolvedModal } from './components/SolvedModal/SolvedModal';
 import { MoveNotation } from './types/cube';
@@ -220,57 +219,46 @@ export const App: React.FC = () => {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* 1. Header (Fixed Height, flex-shrink-0) */}
+      {/* 1. Header with integrated Shuffle, Timer, Controls & Brand */}
       <Header
+        timeMs={solveTimeMs}
+        isTimerRunning={isTimerRunning}
+        isTimerArmed={isTimerArmed}
+        personalBestMs={personalBestMs}
+        moveCount={moveHistory.length}
+        canUndo={moveHistory.length > 0}
+        isAnimating={isAnimating}
+        onScramble={handleScramble}
+        onReset={handleReset}
+        onUndo={handleUndo}
+        speedMs={speedMs}
+        onSpeedChange={setSpeedMs}
         onOpenNotation={() => setIsNotationOpen(true)}
-        onResetCube={handleReset}
-        onScrambleCube={handleScramble}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
         isFullscreen={isFullscreen}
         onToggleFullscreen={handleToggleFullscreen}
       />
 
-      {/* 2. Main Area: Left 3D Cube Canvas, Right Turning Option Controls */}
-      <main className="flex-1 w-full max-w-[1600px] mx-auto p-2 sm:p-2.5 md:p-3 flex flex-col gap-2 lg:min-h-0 overflow-y-auto lg:overflow-hidden">
-        {/* Top: Arcade Game HUD (Shuffle, Stopwatch, PB, Turns, Speed) */}
-        <div className="flex-shrink-0 w-full">
-          <GameHUD
-            timeMs={solveTimeMs}
-            isTimerRunning={isTimerRunning}
-            isTimerArmed={isTimerArmed}
-            personalBestMs={personalBestMs}
-            moveCount={moveHistory.length}
-            canUndo={moveHistory.length > 0}
-            isAnimating={isAnimating}
-            onScramble={handleScramble}
-            onReset={handleReset}
-            onUndo={handleUndo}
-            speedMs={speedMs}
-            onSpeedChange={setSpeedMs}
+      {/* 2. Main Area with balanced side margins: Left 3D Cube Canvas, Right Turning Controls */}
+      <main className="flex-1 w-full max-w-[1550px] mx-auto px-4 sm:px-8 lg:px-12 py-3 sm:py-4 flex flex-col lg:flex-row gap-4 lg:gap-6 lg:min-h-0 overflow-y-auto lg:overflow-hidden items-stretch">
+        {/* Left: Interactive 3D Rubik's Cube Canvas */}
+        <div className="flex-1 min-h-[360px] sm:min-h-[420px] lg:min-h-0 bg-white/70 backdrop-blur-xs rounded-3xl border-2 border-indigo-100/90 shadow-sm relative overflow-hidden flex flex-col items-center justify-center">
+          <CubeCanvas
+            ref={cubeCanvasRef}
+            animationSpeedMs={speedMs}
           />
         </div>
 
-        {/* Content Split: Left Cube (prominent & flexible), Right Turning Options */}
-        <div className="flex-1 w-full flex flex-col lg:flex-row gap-2 sm:gap-3 lg:min-h-0 items-stretch">
-          {/* Left: Interactive 3D Rubik's Cube Canvas */}
-          <div className="flex-1 min-h-[340px] sm:min-h-[400px] lg:min-h-0 bg-white/60 backdrop-blur-xs rounded-2xl border-2 border-indigo-100/80 shadow-xs relative overflow-hidden flex flex-col items-center justify-center">
-            <CubeCanvas
-              ref={cubeCanvasRef}
-              animationSpeedMs={speedMs}
-            />
-          </div>
-
-          {/* Right: Turning Option Controls */}
-          <div className="w-full lg:w-[380px] xl:w-[430px] flex-shrink-0 flex flex-col">
-            <ManualControls
-              onExecuteMove={handleExecuteMove}
-              onReset={handleReset}
-              onUndo={handleUndo}
-              canUndo={moveHistory.length > 0}
-              isAnimating={isAnimating}
-            />
-          </div>
+        {/* Right: Turning Option Controls */}
+        <div className="w-full lg:w-[380px] xl:w-[430px] flex-shrink-0 flex flex-col">
+          <ManualControls
+            onExecuteMove={handleExecuteMove}
+            onReset={handleReset}
+            onUndo={handleUndo}
+            canUndo={moveHistory.length > 0}
+            isAnimating={isAnimating}
+          />
         </div>
       </main>
 
