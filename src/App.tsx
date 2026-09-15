@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Header } from './components/Header/Header';
 import { NotationModal } from './components/Header/NotationModal';
 import { CubeCanvas, CubeCanvasHandle } from './components/RubiksCube/CubeCanvas';
-import { SolveStatsBar } from './components/Controls/SolveStatsBar';
+import { GameHUD } from './components/Controls/GameHUD';
 import { ManualControls } from './components/Controls/ManualControls';
 import { SolvedModal } from './components/SolvedModal/SolvedModal';
 import { MoveNotation } from './types/cube';
@@ -26,9 +26,42 @@ export const App: React.FC = () => {
   const [isTimerArmed, setIsTimerArmed] = useState<boolean>(false);
   const timerStartRef = useRef<number | null>(null);
 
+  // Personal Best from LocalStorage
+  const [personalBestMs, setPersonalBestMs] = useState<number | null>(() => {
+    try {
+      const saved = localStorage.getItem('cubesolve_pb');
+      return saved ? parseInt(saved, 10) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [isNewBest, setIsNewBest] = useState<boolean>(false);
+
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
   // Modals
   const [isNotationOpen, setIsNotationOpen] = useState<boolean>(false);
   const [isSolvedModalOpen, setIsSolvedModalOpen] = useState<boolean>(false);
+
+  // Synchronize fullscreen state
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const handleToggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  }, []);
 
   // Toggle procedural audio
   const handleToggleSound = () => {
@@ -77,11 +110,27 @@ export const App: React.FC = () => {
         if (solved) {
           setIsTimerRunning(false);
           setIsTimerArmed(false);
+          const finalTime = timerStartRef.current ? Date.now() - timerStartRef.current : solveTimeMs;
+          setSolveTimeMs(finalTime);
+
+          // Check if this is a personal best
+          if (finalTime > 500 && (personalBestMs === null || finalTime < personalBestMs)) {
+            setPersonalBestMs(finalTime);
+            try {
+              localStorage.setItem('cubesolve_pb', String(finalTime));
+            } catch {
+              // ignore
+            }
+            setIsNewBest(true);
+          } else {
+            setIsNewBest(false);
+          }
+
           setIsSolvedModalOpen(true);
         }
       }, 50);
     },
-    [isAnimating, isTimerArmed, isTimerRunning, moveHistory, speedMs]
+    [isAnimating, isTimerArmed, isTimerRunning, moveHistory, personalBestMs, solveTimeMs, speedMs]
   );
 
   // Scramble / Shuffle the cube
@@ -93,6 +142,7 @@ export const App: React.FC = () => {
     timerStartRef.current = null;
     setSolveTimeMs(0);
     setMoveHistory([]);
+    setIsNewBest(false);
 
     const scrambleMoves = generateRandomScramble(20);
 
@@ -145,6 +195,9 @@ export const App: React.FC = () => {
       if (e.code === 'Space') {
         e.preventDefault();
         handleScramble();
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        handleToggleFullscreen();
       } else if (e.code === 'KeyN') {
         setIsNotationOpen((prev) => !prev);
       } else if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) {
@@ -159,10 +212,10 @@ export const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleExecuteMove, handleScramble, handleUndo]);
+  }, [handleExecuteMove, handleScramble, handleToggleFullscreen, handleUndo]);
 
   return (
-    <div className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-gradient-to-br from-slate-50 via-sky-50/15 to-indigo-50/25 text-slate-900 flex flex-col lg:overflow-hidden font-sans select-none relative">
+    <div className="min-h-screen lg:h-screen lg:max-h-screen w-full bg-gradient-to-br from-slate-50 via-sky-50/20 to-indigo-50/25 text-slate-900 flex flex-col lg:overflow-hidden font-sans select-none relative">
       {/* Subtle ambient lighting orbs */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
       <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-400/5 rounded-full blur-3xl pointer-events-none -z-10" />
@@ -174,16 +227,19 @@ export const App: React.FC = () => {
         onScrambleCube={handleScramble}
         isSoundEnabled={isSoundEnabled}
         onToggleSound={handleToggleSound}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={handleToggleFullscreen}
       />
 
-      {/* 2. Main Area (Prominent Centered 3D Cube with Stats & Manual Controls) */}
-      <main className="flex-1 w-full max-w-[1400px] mx-auto p-2 sm:p-2.5 md:p-3 flex flex-col gap-2 lg:min-h-0">
-        {/* Top Control & Stats Bar: Shuffle, Live Timer, Moves, Reset, Undo, Speed */}
+      {/* 2. Main Area: Left 3D Cube Canvas, Right Turning Option Controls */}
+      <main className="flex-1 w-full max-w-[1600px] mx-auto p-2 sm:p-2.5 md:p-3 flex flex-col gap-2 lg:min-h-0 overflow-y-auto lg:overflow-hidden">
+        {/* Top: Arcade Game HUD (Shuffle, Stopwatch, PB, Turns, Speed) */}
         <div className="flex-shrink-0 w-full">
-          <SolveStatsBar
+          <GameHUD
             timeMs={solveTimeMs}
             isTimerRunning={isTimerRunning}
             isTimerArmed={isTimerArmed}
+            personalBestMs={personalBestMs}
             moveCount={moveHistory.length}
             canUndo={moveHistory.length > 0}
             isAnimating={isAnimating}
@@ -195,30 +251,33 @@ export const App: React.FC = () => {
           />
         </div>
 
-        {/* Center: Interactive 3D Rubik's Cube */}
-        <div className="flex-1 w-full min-h-[300px] sm:min-h-[380px] lg:min-h-0 flex flex-col items-center justify-center">
-          <CubeCanvas
-            ref={cubeCanvasRef}
-            animationSpeedMs={speedMs}
-          />
-        </div>
+        {/* Content Split: Left Cube (prominent & flexible), Right Turning Options */}
+        <div className="flex-1 w-full flex flex-col lg:flex-row gap-2 sm:gap-3 lg:min-h-0 items-stretch">
+          {/* Left: Interactive 3D Rubik's Cube Canvas */}
+          <div className="flex-1 min-h-[340px] sm:min-h-[400px] lg:min-h-0 bg-white/60 backdrop-blur-xs rounded-2xl border-2 border-indigo-100/80 shadow-xs relative overflow-hidden flex flex-col items-center justify-center">
+            <CubeCanvas
+              ref={cubeCanvasRef}
+              animationSpeedMs={speedMs}
+            />
+          </div>
 
-        {/* Bottom Section: Color-Matched Manual Face Turn Controls (flex-shrink-0) */}
-        <div className="flex-shrink-0 w-full">
-          <ManualControls
-            onExecuteMove={handleExecuteMove}
-            onReset={handleReset}
-            onUndo={handleUndo}
-            canUndo={moveHistory.length > 0}
-            isAnimating={isAnimating}
-          />
+          {/* Right: Turning Option Controls */}
+          <div className="w-full lg:w-[380px] xl:w-[430px] flex-shrink-0 flex flex-col">
+            <ManualControls
+              onExecuteMove={handleExecuteMove}
+              onReset={handleReset}
+              onUndo={handleUndo}
+              canUndo={moveHistory.length > 0}
+              isAnimating={isAnimating}
+            />
+          </div>
         </div>
       </main>
 
       {/* 3. Footer (Fixed Height, flex-shrink-0) */}
       <footer className="flex-shrink-0 w-full border-t border-slate-200/80 py-1.5 px-3 sm:px-4 text-center text-[10px] sm:text-[11px] text-slate-500 bg-white/80 backdrop-blur-sm">
-        <span className="bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 bg-clip-text text-transparent font-medium">
-          Interactive 3D Rubik's Cube Simulator • Real 3D Physical Rotations • Three.js & React Three Fiber
+        <span className="bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600 bg-clip-text text-transparent font-bold">
+          CubeSolve • Authentic 3D Rubik's Cube Physics • WebGL & React Three Fiber
         </span>
       </footer>
 
@@ -238,9 +297,12 @@ export const App: React.FC = () => {
         }}
         timeMs={solveTimeMs}
         moveCount={moveHistory.length}
+        isNewBest={isNewBest}
+        personalBestMs={personalBestMs}
       />
     </div>
   );
 };
 
 export default App;
+

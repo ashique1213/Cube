@@ -1,5 +1,4 @@
 import React from 'react';
-import { RotateCcw, Undo2 } from 'lucide-react';
 import { Face, MoveNotation } from '../../types/cube';
 
 interface ManualControlsProps {
@@ -13,132 +12,146 @@ interface ManualControlsProps {
 interface FaceButtonGroup {
   face: Face;
   label: string;
-  colorBg: string;
-  textColor: string;
-  borderColor: string;
-  moves: [MoveNotation, MoveNotation, MoveNotation];
+  faceClass: string;
+  tagColor: string;
+  moves: { notation: MoveNotation; shortcut: string }[];
 }
 
 const FACE_GROUPS: FaceButtonGroup[] = [
   {
     face: 'U',
-    label: 'Up',
-    colorBg: 'bg-gradient-to-b from-amber-100 to-yellow-100 hover:from-amber-200 hover:to-yellow-200 active:from-amber-300 active:to-yellow-300',
-    textColor: 'text-amber-900',
-    borderColor: 'border-amber-300/80',
-    moves: ['U', "U'", 'U2'],
+    label: 'Up (White)',
+    faceClass: 'btn-face-u',
+    tagColor: 'text-amber-900 bg-amber-200/60 border-amber-300',
+    moves: [
+      { notation: 'U', shortcut: 'U' },
+      { notation: "U'", shortcut: '⇧U' },
+      { notation: 'U2', shortcut: '2x' },
+    ],
   },
   {
     face: 'D',
-    label: 'Down',
-    colorBg: 'bg-gradient-to-b from-white to-slate-100 hover:from-slate-50 hover:to-slate-200 active:from-slate-200 active:to-slate-300',
-    textColor: 'text-slate-800',
-    borderColor: 'border-slate-300',
-    moves: ['D', "D'", 'D2'],
+    label: 'Down (Yellow)',
+    faceClass: 'btn-face-d',
+    tagColor: 'text-yellow-900 bg-yellow-100 border-yellow-300',
+    moves: [
+      { notation: 'D', shortcut: 'D' },
+      { notation: "D'", shortcut: '⇧D' },
+      { notation: 'D2', shortcut: '2x' },
+    ],
   },
   {
     face: 'R',
-    label: 'Right',
-    colorBg: 'bg-gradient-to-b from-red-50 to-rose-100 hover:from-red-100 hover:to-rose-200 active:from-red-200 active:to-rose-300',
-    textColor: 'text-red-800',
-    borderColor: 'border-red-300/80',
-    moves: ['R', "R'", 'R2'],
+    label: 'Right (Red)',
+    faceClass: 'btn-face-r',
+    tagColor: 'text-rose-900 bg-rose-100 border-rose-300',
+    moves: [
+      { notation: 'R', shortcut: 'R' },
+      { notation: "R'", shortcut: '⇧R' },
+      { notation: 'R2', shortcut: '2x' },
+    ],
   },
   {
     face: 'L',
-    label: 'Left',
-    colorBg: 'bg-gradient-to-b from-orange-50 to-amber-100 hover:from-orange-100 hover:to-amber-200 active:from-orange-200 active:to-amber-300',
-    textColor: 'text-orange-800',
-    borderColor: 'border-orange-300/80',
-    moves: ['L', "L'", 'L2'],
+    label: 'Left (Orange)',
+    faceClass: 'btn-face-l',
+    tagColor: 'text-orange-900 bg-orange-100 border-orange-300',
+    moves: [
+      { notation: 'L', shortcut: 'L' },
+      { notation: "L'", shortcut: '⇧L' },
+      { notation: 'L2', shortcut: '2x' },
+    ],
   },
   {
     face: 'F',
-    label: 'Front',
-    colorBg: 'bg-gradient-to-b from-emerald-50 to-teal-100 hover:from-emerald-100 hover:to-teal-200 active:from-emerald-200 active:to-teal-300',
-    textColor: 'text-emerald-800',
-    borderColor: 'border-emerald-300/80',
-    moves: ['F', "F'", 'F2'],
+    label: 'Front (Green)',
+    faceClass: 'btn-face-f',
+    tagColor: 'text-emerald-900 bg-emerald-100 border-emerald-300',
+    moves: [
+      { notation: 'F', shortcut: 'F' },
+      { notation: "F'", shortcut: '⇧F' },
+      { notation: 'F2', shortcut: '2x' },
+    ],
   },
   {
     face: 'B',
-    label: 'Back',
-    colorBg: 'bg-gradient-to-b from-blue-50 to-indigo-100 hover:from-blue-100 hover:to-indigo-200 active:from-blue-200 active:to-indigo-300',
-    textColor: 'text-blue-800',
-    borderColor: 'border-blue-300/80',
-    moves: ['B', "B'", 'B2'],
+    label: 'Back (Blue)',
+    faceClass: 'btn-face-b',
+    tagColor: 'text-blue-900 bg-blue-100 border-blue-300',
+    moves: [
+      { notation: 'B', shortcut: 'B' },
+      { notation: "B'", shortcut: '⇧B' },
+      { notation: 'B2', shortcut: '2x' },
+    ],
   },
 ];
 
 export const ManualControls: React.FC<ManualControlsProps> = ({
   onExecuteMove,
-  onReset,
-  onUndo,
-  canUndo,
   isAnimating,
 }) => {
   return (
-    <div className="w-full bg-white/95 backdrop-blur-md rounded-xl border border-slate-200/90 p-2 sm:p-2.5 shadow-xs space-y-1.5 flex-shrink-0">
-      {/* Header bar with title & Undo / Reset */}
-      <div className="flex items-center justify-between px-0.5">
+    <div className="w-full bg-white/95 backdrop-blur-md rounded-2xl border-2 border-indigo-100/90 p-2.5 sm:p-3 shadow-md shadow-indigo-500/5 flex flex-col justify-between gap-2 h-full">
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-0.5 border-b border-slate-100 pb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-            Manual Face Turns
+          <span className="text-xs sm:text-sm font-black uppercase tracking-wider bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 bg-clip-text text-transparent">
+            TURNING CONTROLS
           </span>
-          <span className="text-[9px] sm:text-[10px] text-slate-400 hidden sm:inline">
-            (Interactive 3D layer controls)
+          <span className="text-[9px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.2 rounded-full">
+            6 Faces
           </span>
         </div>
-
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onUndo}
-            disabled={!canUndo || isAnimating}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-b from-white to-slate-100 hover:from-slate-50 hover:to-slate-200 active:to-slate-300 disabled:opacity-40 disabled:cursor-not-allowed text-[10px] sm:text-[11px] font-semibold text-slate-700 transition-all border border-slate-300 shadow-2xs"
-            title="Undo last move"
-          >
-            <Undo2 className="w-3 h-3" />
-            <span>Undo</span>
-          </button>
-
-          <button
-            onClick={onReset}
-            disabled={isAnimating}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-b from-rose-50 to-red-100 hover:from-rose-100 hover:to-red-200 active:to-red-300 text-[10px] sm:text-[11px] font-semibold text-rose-700 border border-rose-300 transition-all shadow-2xs"
-            title="Reset cube"
-          >
-            <RotateCcw className="w-3 h-3" />
-            <span>Reset</span>
-          </button>
-        </div>
+        <span className="text-[10px] font-mono text-slate-400 font-bold hidden sm:inline">
+          [U, D, R, L, F, B]
+        </span>
       </div>
 
-      {/* Responsive Grid: 3 cols on mobile, 6 cols on sm/md and up */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-1.5">
+      {/* Grid: 2 columns on desktop (side panel), 3 cols on tablet, 2 cols on mobile */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-1.5 sm:gap-2 flex-1 items-center">
         {FACE_GROUPS.map((group) => (
           <div
             key={group.face}
-            className="bg-gradient-to-b from-slate-50 to-slate-100/60 border border-slate-200/90 rounded-xl p-1 sm:p-1.5 flex flex-col items-center gap-1 shadow-2xs"
+            className="bg-slate-50/90 hover:bg-slate-100/80 transition-colors border border-slate-200/90 rounded-xl p-1.5 sm:p-2 flex flex-col justify-center gap-1 shadow-2xs"
           >
-            <span className={`text-[9px] sm:text-[10px] font-bold ${group.textColor} uppercase tracking-wider`}>
-              {group.label}
-            </span>
+            {/* Face Badge */}
+            <div className="w-full flex items-center justify-between px-0.5">
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-wide text-slate-700 truncate">
+                {group.label}
+              </span>
+              <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${group.tagColor}`}>
+                {group.face}
+              </span>
+            </div>
 
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1 w-full">
-              {group.moves.map((move) => (
+            {/* 3 Tactile Buttons per face: Normal, Inverse, Double */}
+            <div className="grid grid-cols-3 gap-1 w-full">
+              {group.moves.map(({ notation, shortcut }) => (
                 <button
-                  key={move}
-                  onClick={() => onExecuteMove(move)}
+                  key={notation}
+                  onClick={() => onExecuteMove(notation)}
                   disabled={isAnimating}
-                  className={`py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-[11px] font-mono font-bold transition-all border ${group.colorBg} ${group.textColor} ${group.borderColor} active:scale-95 disabled:opacity-40 shadow-xs hover:shadow-sm`}
+                  className={`py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-mono font-black border transition-all cursor-pointer select-none flex flex-col items-center justify-center gap-0.5 ${group.faceClass}`}
+                  title={`Turn ${notation} (${shortcut})`}
                 >
-                  {move}
+                  <span className="leading-none">{notation}</span>
+                  <span className="text-[7px] sm:text-[8px] font-sans opacity-60 leading-none">
+                    {shortcut}
+                  </span>
                 </button>
               ))}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Footer hint */}
+      <div className="pt-1 border-t border-slate-100 flex items-center justify-between text-[9px] sm:text-[10px] font-bold text-slate-400 px-0.5">
+        <span>Click button or press Key</span>
+        <span className="text-indigo-600">Shift = Counter-Clockwise</span>
+      </div>
     </div>
   );
 };
+
+
