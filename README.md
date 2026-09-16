@@ -1,32 +1,59 @@
-# React + TypeScript + Vite
+# 🧊 CubeSolve
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+An interactive 3D 3x3 Rubik's Cube solver and learning application built with React, Three.js, React Three Fiber, and TypeScript.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- 🎲 **Interactive 3D Cube**: Smooth face rotation animations powered by Three.js & R3F.
+- 🧩 **Step-by-Step Solver**: Interactive beginner method guide and auto-solver algorithm engine.
+- ⚡ **Full Notation Controls**: Interactive standard Rubik's Cube move execution (`U`, `D`, `L`, `R`, `F`, `B` & inverses).
+- 🔄 **Move History & Undo**: Track past rotations, undo steps, or scramble the cube instantly.
+- 🎨 **Modern Design**: Responsive glassmorphism UI styled with Tailwind CSS.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the Oxlint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- **Frontend**: React 18, TypeScript, Vite
+- **3D Graphics**: Three.js, React Three Fiber (`@react-three/fiber`), Drei (`@react-three/drei`)
+- **Styling**: Tailwind CSS, Lucide React Icons
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- `npm` or `yarn`
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/ashique1213/Cube.git
+cd Cube
+
+# 2. Install dependencies
+npm install
+
+# 3. Start local dev server
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Open `http://localhost:5173` in your browser.
+
+---
+
+## 🏗️ Build for Production
+
+```bash
+npm run build
+```
+
+---
+
+## 🌐 Powered By
+
+Powered by [QueStack Solutions](https://questacksolutions.vercel.app).
