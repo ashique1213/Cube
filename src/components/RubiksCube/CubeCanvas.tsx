@@ -1,5 +1,5 @@
 import React, { useRef, useImperativeHandle, forwardRef, useEffect, useCallback } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, ContactShadows } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
@@ -45,6 +45,27 @@ const CameraRig: React.FC<{
       onChange={onCameraChange}
     />
   );
+};
+
+// Dynamically scale camera FOV on portrait mobile screens so cube is clear & properly sized
+const ResponsiveCameraManager: React.FC = () => {
+  const { camera, size } = useThree();
+  useEffect(() => {
+    const aspect = size.width / size.height;
+    const perspCamera = camera as THREE.PerspectiveCamera;
+    if (perspCamera && perspCamera.isPerspectiveCamera) {
+      if (aspect < 0.75) {
+        perspCamera.fov = 48;
+      } else if (aspect < 1.0) {
+        perspCamera.fov = 42;
+      } else {
+        perspCamera.fov = 38;
+      }
+      perspCamera.updateProjectionMatrix();
+    }
+  }, [camera, size.width, size.height]);
+
+  return null;
 };
 
 export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
@@ -147,7 +168,7 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
     }));
 
     return (
-      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-3xl overflow-hidden border border-indigo-100/90 shadow-sm">
+      <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-indigo-50/70 via-slate-50 to-blue-50/60 rounded-2xl sm:rounded-3xl overflow-hidden border border-indigo-100/90 shadow-sm">
         {/* Quick View Presets (Top Left) */}
         <ViewControls
           onPresetSelect={handleCameraPreset}
@@ -155,67 +176,68 @@ export const CubeCanvas = forwardRef<CubeCanvasHandle, CubeCanvasProps>(
         />
 
         {/* 4-Way Tactile Cube Rotation Controller (Bottom Right) */}
-        <div className="absolute bottom-2.5 right-2.5 z-20 flex flex-col items-center gap-0.5 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl border border-indigo-100 shadow-md">
-          <div className="flex items-center gap-1 text-[8px] font-black uppercase text-indigo-700 tracking-wider mb-0.5">
-            <RotateCw className="w-2.5 h-2.5" />
-            <span>ROTATE CUBE</span>
+        <div className="absolute bottom-1.5 right-1.5 sm:bottom-2.5 sm:right-2.5 z-20 flex flex-col items-center gap-0.5 bg-white/90 backdrop-blur-md p-1 sm:p-1.5 rounded-xl sm:rounded-2xl border border-indigo-100 shadow-sm">
+          <div className="flex items-center gap-0.5 sm:gap-1 text-[7px] sm:text-[8px] font-black uppercase text-indigo-700 tracking-wider mb-0.5">
+            <RotateCw className="w-2 h-2 sm:w-2.5 sm:h-2.5" />
+            <span>ROTATE</span>
           </div>
 
           <button
             onClick={() => rotateView('up')}
-            className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+            className="w-6 h-5 sm:w-7 sm:h-6 rounded-md sm:rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
             title="Rotate Up / Top View (Arrow Up)"
             aria-label="Rotate cube up"
           >
-            <ChevronUp className="w-4 h-4" />
+            <ChevronUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 sm:gap-1">
             <button
               onClick={() => rotateView('left')}
-              className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+              className="w-6 h-5 sm:w-7 sm:h-6 rounded-md sm:rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
               title="Rotate Left (Arrow Left)"
               aria-label="Rotate cube left"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
-            <span className="text-[7px] font-mono font-bold text-slate-400 px-0.5">3D</span>
+            <span className="text-[6px] sm:text-[7px] font-mono font-bold text-slate-400 px-0.5">3D</span>
 
             <button
               onClick={() => rotateView('right')}
-              className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+              className="w-6 h-5 sm:w-7 sm:h-6 rounded-md sm:rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
               title="Rotate Right (Arrow Right)"
               aria-label="Rotate cube right"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
 
           <button
             onClick={() => rotateView('down')}
-            className="w-7 h-6 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
+            className="w-6 h-5 sm:w-7 sm:h-6 rounded-md sm:rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-700 transition-all flex items-center justify-center font-bold shadow-2xs active:scale-95 cursor-pointer"
             title="Rotate Down / Bottom View (Arrow Down)"
             aria-label="Rotate cube down"
           >
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
 
         {/* Orbit Helper Tip (Bottom Left) */}
-        <div className="absolute bottom-2.5 left-2.5 z-10 pointer-events-none text-[9px] sm:text-[10px] text-slate-500 bg-white/85 backdrop-blur-md px-2 py-0.5 rounded-lg border border-indigo-100/80 shadow-2xs flex items-center gap-1 font-medium">
+        <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 z-10 pointer-events-none text-[8px] sm:text-[10px] text-slate-500 bg-white/80 backdrop-blur-md px-1.5 sm:px-2 py-0.5 rounded-md sm:rounded-lg border border-indigo-100/80 shadow-2xs flex items-center gap-1 font-medium">
           <span>Drag: Orbit</span>
           <span className="text-indigo-300">•</span>
           <span>Arrows: Rotate</span>
         </div>
 
-        {/* 3D WebGL Canvas with Closer Camera for Maximum Cube Size */}
+        {/* 3D WebGL Canvas with Responsive FOV */}
         <Canvas
           shadows
           camera={{ position: [2.9, 3.4, 3.6], fov: 38 }}
           gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >
+          <ResponsiveCameraManager />
           {/* Studio Lighting */}
           <ambientLight intensity={1.15} />
 

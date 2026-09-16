@@ -281,9 +281,9 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Area: Clean, tight margins, Left 3D Cube Canvas, Right Turning Controls */}
-      <main className="flex-1 w-full max-w-[1750px] mx-auto px-2 sm:px-3 lg:px-4 py-1.5 sm:py-2 flex flex-col lg:flex-row gap-2 sm:gap-2.5 lg:min-h-0 overflow-y-auto lg:overflow-hidden items-stretch">
-        {/* Left: Interactive 3D Rubik's Cube Canvas (maximum space, minimal dead whitespace) */}
-        <div className="flex-1 min-h-[360px] sm:min-h-[420px] lg:min-h-0 bg-white/70 backdrop-blur-xs rounded-3xl border border-indigo-100/90 shadow-sm relative overflow-hidden flex flex-col items-center justify-center">
+      <main className="flex-1 w-full max-w-[1750px] mx-auto px-1.5 sm:px-3 lg:px-4 py-1 sm:py-2 flex flex-col lg:flex-row gap-1.5 sm:gap-2.5 lg:min-h-0 overflow-y-auto lg:overflow-hidden items-stretch">
+        {/* Left: Interactive 3D Rubik's Cube Canvas */}
+        <div className="flex-1 h-[42vh] min-h-[300px] sm:min-h-[400px] lg:h-full lg:min-h-0 bg-white/70 backdrop-blur-xs rounded-2xl sm:rounded-3xl border border-indigo-100/90 shadow-sm relative overflow-hidden flex flex-col items-center justify-center flex-shrink-0 lg:flex-shrink">
           <CubeCanvas
             ref={cubeCanvasRef}
             animationSpeedMs={speedMs}
