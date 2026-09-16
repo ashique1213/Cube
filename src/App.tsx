@@ -317,7 +317,7 @@ export const App: React.FC = () => {
             rel="noopener noreferrer"
             className="text-indigo-700 hover:text-indigo-950 font-black underline underline-offset-2 decoration-indigo-300 hover:decoration-indigo-700 transition-colors"
           >
-            Questack Solutions
+            QueStack Solutions
           </a>
         </div>
       </footer>
