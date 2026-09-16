@@ -70,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
   const tps = timeMs > 0 ? (moveCount / (timeMs / 1000)).toFixed(1) : '0.0';
 
   return (
-    <header className="w-full bg-white/95 backdrop-blur-md border-b border-indigo-100/90 px-1.5 sm:px-4 lg:px-6 py-1 sm:py-2 flex flex-wrap lg:flex-nowrap items-center justify-between gap-1 sm:gap-2 flex-shrink-0 z-30 shadow-2xs">
+    <header className="w-full bg-white/95 backdrop-blur-md border-b border-indigo-100/90 px-1.5 sm:px-4 lg:px-6 py-1 sm:py-2 flex items-center justify-between gap-1 sm:gap-2 flex-shrink-0 z-30 shadow-2xs">
       {/* 1. Brand Logo & Title */}
       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-sm shadow-indigo-500/25 flex-shrink-0 border-b-2 border-indigo-800">
@@ -87,16 +87,16 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* 2. Core Game Action Buttons & Interactive Stopwatch */}
-      <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 flex-1 justify-center max-w-full overflow-x-auto scrollbar-none py-0.5">
-        {/* Shuffle [Space] Button */}
+      <div className="flex items-center gap-1 sm:gap-1.5 flex-1 justify-center flex-shrink-0">
+        {/* Shuffle Button - Always Primary & Visible on Mobile */}
         <button
           onClick={onScramble}
           disabled={isAnimating}
-          className="btn-game-orange flex items-center gap-1 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black text-[10px] sm:text-xs tracking-wide disabled:opacity-50 cursor-pointer select-none flex-shrink-0"
+          className="btn-game-orange flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white font-black text-[11px] sm:text-xs tracking-wide disabled:opacity-50 cursor-pointer select-none flex-shrink-0 shadow-xs"
           title="Shuffle cube randomly (Spacebar)"
         >
-          <Shuffle className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5" />
-          <span>SHUFFLE</span>
+          <Shuffle className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+          <span className="leading-none">SHUFFLE</span>
           <span className="hidden lg:inline-block px-1 py-0.2 rounded bg-amber-700/60 text-[8px] font-mono text-amber-100">
             SPACE
           </span>
@@ -106,28 +106,28 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onReset}
           disabled={isAnimating}
-          className="btn-game-rose flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-b from-white to-rose-50 text-rose-700 border border-rose-200 text-[10px] sm:text-xs font-black transition-all cursor-pointer select-none flex-shrink-0"
+          className="btn-game-rose flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-b from-white to-rose-50 text-rose-700 border border-rose-200 text-[10px] sm:text-xs font-black transition-all cursor-pointer select-none flex-shrink-0"
           title="Reset cube to solved"
         >
           <RotateCcw className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-rose-600" />
-          <span>RESET</span>
+          <span className="hidden xs:inline">RESET</span>
         </button>
 
         {/* Undo Button */}
         <button
           onClick={onUndo}
           disabled={!canUndo || isAnimating}
-          className="btn-game-slate flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-b from-white to-slate-50 text-slate-700 border border-slate-300 text-[10px] sm:text-xs font-black transition-all disabled:opacity-40 cursor-pointer select-none flex-shrink-0"
+          className="btn-game-slate flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl bg-gradient-to-b from-white to-slate-50 text-slate-700 border border-slate-300 text-[10px] sm:text-xs font-black transition-all disabled:opacity-40 cursor-pointer select-none flex-shrink-0"
           title="Undo last move (Ctrl+Z)"
         >
           <Undo2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-500" />
-          <span>UNDO</span>
+          <span className="hidden xs:inline">UNDO</span>
         </button>
 
         {/* Interactive Stopwatch Button */}
         <button
           onClick={onToggleTimer}
-          className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all cursor-pointer select-none flex-shrink-0 ${
+          className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all cursor-pointer select-none flex-shrink-0 ${
             isTimerRunning
               ? 'bg-emerald-50 hover:bg-emerald-100 border-emerald-400 text-emerald-950 shadow-xs'
               : isTimerArmed
@@ -157,7 +157,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Personal Best (PB) */}
-        <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-300 text-amber-950 flex-shrink-0">
+        <div className="hidden sm:flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-amber-500/10 border border-amber-300 text-amber-950 flex-shrink-0">
           <Trophy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600 flex-shrink-0" />
           <div className="flex flex-col leading-none">
             <span className="font-mono text-[10px] sm:text-xs font-black">
@@ -168,7 +168,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Move Count & TPS */}
-        <div className="flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-900 flex-shrink-0">
+        <div className="hidden md:flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-slate-50 border border-slate-200 text-slate-900 flex-shrink-0">
           <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-600 flex-shrink-0" />
           <div className="flex flex-col leading-none">
             <div className="flex items-baseline gap-0.5">
@@ -180,7 +180,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Speed Dial */}
-        <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-lg sm:rounded-xl border border-slate-200 flex-shrink-0">
+        <div className="hidden lg:flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-lg sm:rounded-xl border border-slate-200 flex-shrink-0">
           <Gauge className="w-2.5 h-2.5 text-slate-400 ml-0.5 mr-0.5 hidden sm:inline" />
           {[
             { label: '0.8s', value: 800 },
