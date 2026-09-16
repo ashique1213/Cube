@@ -1,20 +1,20 @@
-# 🧊 CubeSolve
+# CubeSolve
 
 An interactive 3D 3x3 Rubik's Cube solver and learning application built with React, Three.js, React Three Fiber, and TypeScript.
 
 ---
 
-## ✨ Features
+## Features
 
-- 🎲 **Interactive 3D Cube**: Smooth face rotation animations powered by Three.js & R3F.
-- 🧩 **Step-by-Step Solver**: Interactive beginner method guide and auto-solver algorithm engine.
-- ⚡ **Full Notation Controls**: Interactive standard Rubik's Cube move execution (`U`, `D`, `L`, `R`, `F`, `B` & inverses).
-- 🔄 **Move History & Undo**: Track past rotations, undo steps, or scramble the cube instantly.
-- 🎨 **Modern Design**: Responsive glassmorphism UI styled with Tailwind CSS.
+- **Interactive 3D Cube**: Smooth face rotation animations powered by Three.js & React Three Fiber.
+- **Step-by-Step Solver**: Interactive beginner method guide and auto-solver algorithm engine.
+- **Full Notation Controls**: Interactive standard Rubik's Cube move execution (U, D, L, R, F, B & inverses).
+- **Move History & Undo**: Track past rotations, undo steps, or scramble the cube instantly.
+- **Modern Design**: Responsive glassmorphism UI styled with Tailwind CSS.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18, TypeScript, Vite
 - **3D Graphics**: Three.js, React Three Fiber (`@react-three/fiber`), Drei (`@react-three/drei`)
@@ -22,11 +22,11 @@ An interactive 3D 3x3 Rubik's Cube solver and learning application built with Re
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+ recommended)
-- `npm` or `yarn`
+- Node.js (v18+ recommended)
+- npm or yarn
 
 ### Installation
 
@@ -46,7 +46,7 @@ Open `http://localhost:5173` in your browser.
 
 ---
 
-## 🏗️ Build for Production
+## Build for Production
 
 ```bash
 npm run build
@@ -54,6 +54,6 @@ npm run build
 
 ---
 
-## 🌐 Powered By
+## Powered By
 
 Powered by [QueStack Solutions](https://questacksolutions.vercel.app).
